@@ -1,0 +1,107 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <!-- Ciel : bleu → gris → orange → jaune vers l'horizon -->
+    <linearGradient id="ciel" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"   stop-color="#1d4e8f"/>
+      <stop offset="14%"  stop-color="#3a72b0"/>
+      <stop offset="30%"  stop-color="#7d95a8"/>
+      <stop offset="44%"  stop-color="#a9a5a0"/>
+      <stop offset="56%"  stop-color="#d99a63"/>
+      <stop offset="68%"  stop-color="#f2913c"/>
+      <stop offset="80%"  stop-color="#ffc247"/>
+      <stop offset="92%"  stop-color="#ffe07a"/>
+      <stop offset="100%" stop-color="#fff0b0"/>
+    </linearGradient>
+
+    <!-- Halo autour du soleil -->
+    <radialGradient id="halo" cx="50%" cy="50%">
+      <stop offset="0%"   stop-color="#ffe89a" stop-opacity=".55"/>
+      <stop offset="24%"  stop-color="#ffc247" stop-opacity=".42"/>
+      <stop offset="58%"  stop-color="#f2801a" stop-opacity=".20"/>
+      <stop offset="100%" stop-color="#f2801a" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Disque solaire -->
+    <radialGradient id="disque" cx="50%" cy="50%">
+      <stop offset="0%"   stop-color="#fffae0"/>
+      <stop offset="52%"  stop-color="#ffe066"/>
+      <stop offset="85%"  stop-color="#ffb52e"/>
+      <stop offset="100%" stop-color="#ff9a1f"/>
+    </radialGradient>
+
+    <!-- Gazon : vert clair au loin, vert profond au premier plan -->
+    <linearGradient id="gazon" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"   stop-color="#9dbf58"/>
+      <stop offset="18%"  stop-color="#6ea63f"/>
+      <stop offset="52%"  stop-color="#4b8a33"/>
+      <stop offset="100%" stop-color="#2b5c24"/>
+    </linearGradient>
+
+    <filter id="flou"><feGaussianBlur stdDeviation="16"/></filter>
+    <filter id="brume"><feGaussianBlur stdDeviation="30"/></filter>
+  </defs>
+
+  <!-- ========================= CIEL ========================= -->
+  <rect width="1600" height="1000" fill="url(#ciel)"/>
+
+  <!-- Soleil bas sur l'horizon -->
+  <ellipse cx="800" cy="692" rx="440" ry="330" fill="url(#halo)"/>
+  <circle cx="800" cy="692" r="96" fill="#ffc43d" opacity=".5" filter="url(#flou)"/>
+  <circle cx="800" cy="692" r="74" fill="url(#disque)"/>
+
+  <!-- Nuages étirés, gris bleutés en haut, dorés en bas -->
+  <g filter="url(#flou)">
+    <ellipse cx="300"  cy="170" rx="300" ry="15" fill="#8fa6bd" opacity=".45"/>
+    <ellipse cx="1180" cy="135" rx="340" ry="12" fill="#8fa6bd" opacity=".38"/>
+    <ellipse cx="640"  cy="255" rx="380" ry="17" fill="#9fa8ae" opacity=".42"/>
+    <ellipse cx="1330" cy="320" rx="290" ry="14" fill="#b4a79e" opacity=".40"/>
+    <ellipse cx="240"  cy="395" rx="330" ry="15" fill="#d7a173" opacity=".45"/>
+    <ellipse cx="980"  cy="455" rx="420" ry="13" fill="#f0a75c" opacity=".42"/>
+    <ellipse cx="420"  cy="520" rx="300" ry="11" fill="#ffc06a" opacity=".38"/>
+  </g>
+
+  <!-- Oiseaux -->
+  <g stroke="#3f4a52" stroke-width="2.6" fill="none" opacity=".5" stroke-linecap="round">
+    <path d="M1120 250 q14 -11 28 0 q14 -11 28 0"/>
+    <path d="M1205 205 q11 -9 22 0 q11 -9 22 0"/>
+    <path d="M1075 305 q9 -7 18 0 q9 -7 18 0"/>
+  </g>
+
+  <!-- ==================== COLLINES LOINTAINES ==================== -->
+  <path d="M0 662 L190 630 L400 655 L620 620 L860 658 L1090 628 L1320 656 L1600 634 L1600 700 L0 700 Z"
+        fill="#7e8a6a" opacity=".55"/>
+  <ellipse cx="800" cy="678" rx="900" ry="26" fill="#ffd98a" opacity=".45" filter="url(#brume)"/>
+
+  <!-- ==================== BANDE DE GAZON ==================== -->
+  <path d="M0 700 Q400 682 800 700 Q1200 718 1600 698 L1600 1000 L0 1000 Z" fill="url(#gazon)"/>
+
+  <!-- Liseré lumineux sur la crête -->
+  <path d="M0 700 Q400 682 800 700 Q1200 718 1600 698"
+        fill="none" stroke="#eaf5ad" stroke-width="2.4" opacity=".42"/>
+
+  <!-- Ondulations du terrain -->
+  <g fill="#ffffff" opacity=".07">
+    <path d="M0 760 Q400 736 800 758 Q1200 780 1600 754 L1600 790 Q1200 812 800 792 Q400 772 0 796 Z"/>
+  </g>
+  <g fill="#000000" opacity=".10">
+    <path d="M0 880 Q420 856 800 878 Q1180 900 1600 874 L1600 1000 L0 1000 Z"/>
+  </g>
+
+  <!-- Brins d'herbe au premier plan -->
+  <g stroke="#3f7a2c" stroke-linecap="round" opacity=".55">
+    <path d="M60 1000 q6 -46 -4 -74"  stroke-width="3"/>
+    <path d="M96 1000 q-8 -38 2 -62"  stroke-width="2.4"/>
+    <path d="M150 1000 q9 -52 -2 -80" stroke-width="3"/>
+    <path d="M1440 1000 q-7 -44 3 -70" stroke-width="3"/>
+    <path d="M1492 1000 q8 -50 -3 -76" stroke-width="2.6"/>
+    <path d="M1540 1000 q-6 -40 4 -64"  stroke-width="3"/>
+  </g>
+
+  <!-- Arbre isolé, en contre-jour -->
+  <g fill="#2d5320" opacity=".8">
+    <rect x="1246" y="636" width="9" height="66" rx="3"/>
+    <ellipse cx="1250" cy="622" rx="44" ry="34"/>
+    <ellipse cx="1224" cy="636" rx="26" ry="19"/>
+    <ellipse cx="1277" cy="634" rx="24" ry="18"/>
+  </g>
+</svg>

@@ -1,0 +1,47 @@
+# =============================================================================
+#  Ce qui part sur GitHub, et ce qui n'en part jamais.
+#
+#  RÈGLE : seul le dossier « medias/ », produit par publier.command à partir
+#  de 1-Photo, 2-Graphi et 3-Audio, a le droit d'être publié.
+#  Les dossiers 4-Perso et 5-Reserves ne doivent jamais quitter le Mac.
+# =============================================================================
+
+# --- Dossiers de la base privée, s'ils étaient copiés ici par erreur --------
+1-Photo/
+2-Graphi/
+3-Audio/
+4-Perso/
+5-Reserves/
+Voyage-en-Imaginaire/
+
+# --- Médias déposés par erreur à la racine du projet -----------------------
+#     (le « / » initial limite la règle à la racine : medias/ n'est pas visé)
+/*.jpg
+/*.jpeg
+/*.png
+/*.gif
+/*.webp
+/*.heic
+/*.heif
+/*.tif
+/*.tiff
+/*.mp3
+/*.wav
+/*.m4a
+/*.flac
+/*.aiff
+/*.mp4
+/*.mov
+
+# --- macOS -----------------------------------------------------------------
+.DS_Store
+._*
+Icon?
+
+# --- Éditeurs --------------------------------------------------------------
+.vscode/
+.idea/
+
+# --- Divers ----------------------------------------------------------------
+*.log
+node_modules/

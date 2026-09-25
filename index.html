@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="fr" data-locked="true">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Voyage en Imaginaire — Laurent GANNE</title>
+  <meta name="description" content="Voyage en Imaginaire — photographies, graphismes et créations sonores de Laurent GANNE." />
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚪</text></svg>" />
+</head>
+<body>
+
+<!-- ================================================================== -->
+<!--  ÉCRAN 1 : PORTAIL — mot de passe d'entrée du site                  -->
+<!-- ================================================================== -->
+<div id="gate" class="gate">
+  <div class="gate__wall" id="gateWall" aria-hidden="true"></div>
+  <div class="gate__veil" aria-hidden="true"></div>
+
+  <div class="gate__content">
+    <p class="gate__eyebrow">Laurent GANNE présente</p>
+    <h1 class="gate__title">Voyage&nbsp;en<br /><em>Imaginaire</em></h1>
+
+    <form class="keyframe" id="gateForm" autocomplete="off">
+      <label class="keyframe__label" for="gateInput">Mot de passe</label>
+      <input
+        class="keyframe__input"
+        id="gateInput"
+        type="password"
+        inputmode="numeric"
+        placeholder="••••••••"
+        required />
+      <button class="keyframe__btn" type="submit">Entrer</button>
+
+      <!-- Aucun indice de format n'est affiché. -->
+      <p class="keyframe__error" id="gateError" role="alert" hidden>Mot de passe incorrect.</p>
+    </form>
+  </div>
+</div>
+
+
+<!-- ================================================================== -->
+<!--  ÉCRAN 2 : LE SITE                                                  -->
+<!-- ================================================================== -->
+<div id="app" class="app" hidden>
+
+  <!-- ---------- MENU COLONNE GAUCHE ---------- -->
+  <aside class="rail" id="rail">
+    <div class="rail__head">
+      <a href="#accueil" class="rail__brand" data-go="accueil">
+        <span class="rail__brand-main">Voyage en</span>
+        <span class="rail__brand-sub">Imaginaire</span>
+      </a>
+      <p class="rail__author">Laurent GANNE</p>
+    </div>
+
+    <nav class="rail__nav">
+      <button class="tab is-active" data-go="accueil">
+        <span class="tab__num">◆</span><span class="tab__label">Accueil</span>
+      </button>
+      <button class="tab" data-go="photo">
+        <span class="tab__num">1</span><span class="tab__label">Photo</span>
+        <span class="tab__count" data-count="photo"></span>
+      </button>
+      <button class="tab" data-go="graphi">
+        <span class="tab__num">2</span><span class="tab__label">Graphi</span>
+        <span class="tab__count" data-count="graphi"></span>
+      </button>
+      <button class="tab" data-go="audio">
+        <span class="tab__num">3</span><span class="tab__label">Audio</span>
+        <span class="tab__count" data-count="audio"></span>
+      </button>
+      <button class="tab tab--locked" data-go="perso">
+        <span class="tab__num">4</span><span class="tab__label">Perso</span>
+        <span class="tab__lock" aria-label="protégé">🔒</span>
+        <span class="tab__count" data-count="perso"></span>
+      </button>
+      <button class="tab tab--locked" data-go="reserves">
+        <span class="tab__num">5</span><span class="tab__label">Réserves</span>
+        <span class="tab__lock" aria-label="protégé">🔒</span>
+        <span class="tab__count" data-count="reserves"></span>
+      </button>
+    </nav>
+
+    <div class="rail__foot">
+      <button class="rail__link" id="connectBtn" title="Relier le dossier du Bureau">
+        <span id="connectDot" class="dot"></span>
+        <span id="connectLabel">Relier mon dossier</span>
+      </button>
+      <input type="file" id="fallbackInput" multiple webkitdirectory hidden />
+      <p class="rail__tip">Flèches <kbd>←</kbd> <kbd>→</kbd> pour défiler</p>
+      <p class="rail__version">Version 1.00 — 25.09.2026</p>
+    </div>
+  </aside>
+
+  <!-- ---------- ZONE PRINCIPALE ---------- -->
+  <main class="stage" id="stage">
+
+    <!-- ===== ACCUEIL ===== -->
+    <section class="view is-active" id="view-accueil">
+      <div class="home">
+        <div class="home__wall" id="homeWall" aria-hidden="true"></div>
+        <div class="home__veil" aria-hidden="true"></div>
+        <div class="home__text">
+          <h2 class="home__title">Voyage en Imaginaire</h2>
+          <p class="home__sub">Photographies · Graphismes · Créations sonores</p>
+          <p class="home__by">Laurent GANNE</p>
+          <p class="home__guide" id="homeGuide">
+            Choisissez une porte dans la colonne de gauche.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== LES 5 ONGLETS (générés sur le même gabarit) ===== -->
+    <section class="view" id="view-photo"    data-cat="photo"></section>
+    <section class="view" id="view-graphi"   data-cat="graphi"></section>
+    <section class="view" id="view-audio"    data-cat="audio"></section>
+    <section class="view" id="view-perso"    data-cat="perso"></section>
+    <section class="view" id="view-reserves" data-cat="reserves"></section>
+
+  </main>
+</div>
+
+
+<!-- ================================================================== -->
+<!--  MODALE : mot de passe horaire (Perso / Réserves)                   -->
+<!-- ================================================================== -->
+<div class="modal" id="lockModal" hidden>
+  <div class="modal__box" role="dialog" aria-modal="true" aria-labelledby="lockTitle">
+    <span class="modal__seal">🔒</span>
+    <h3 class="modal__title" id="lockTitle">Accès réservé</h3>
+    <p class="modal__sub" id="lockSub">Onglet protégé</p>
+    <form id="lockForm" autocomplete="off">
+      <input
+        class="keyframe__input"
+        id="lockInput"
+        type="password"
+        placeholder="••••••••••••••"
+        required />
+      <!-- FORMAT NON VISIBLE : aucun indice n'est donné ici -->
+      <p class="modal__error" id="lockError" role="alert" hidden>Accès refusé.</p>
+      <div class="modal__actions">
+        <button type="button" class="btn btn--ghost" id="lockCancel">Annuler</button>
+        <button type="submit" class="btn btn--primary">Déverrouiller</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Petit message flottant (confirmations d'export, erreurs) -->
+<div class="toast" id="toast" hidden></div>
+
+<!-- Gabarit d'un onglet, cloné par app.js -->
+<template id="tplView">
+  <header class="view__head">
+    <div>
+      <h2 class="view__title"></h2>
+      <p class="view__meta"></p>
+    </div>
+    <div class="view__tools">
+      <button class="chip chip--play" data-act="play" title="Diaporama automatique (barre d'espace)">
+        <span class="chip__icon">▶</span><span data-play-label>Diaporama</span>
+      </button>
+      <button class="chip" data-act="wall" title="Utiliser comme papier peint">Papier peint</button>
+      <div class="export" data-export hidden>
+        <button class="chip chip--export" data-act="export-open">Exporter vers ▾</button>
+        <div class="export__menu">
+          <button data-export-to="photo">1 · Photo</button>
+          <button data-export-to="graphi">2 · Graphi</button>
+          <button data-export-to="audio">3 · Audio</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="viewer" data-viewer tabindex="0">
+    <!-- Minuterie du diaporama -->
+    <div class="timebar" data-timebar hidden><i data-timebar-fill></i></div>
+
+    <div class="viewer__empty" data-empty>
+      <p class="viewer__empty-title">Dossier vide</p>
+      <p class="viewer__empty-text"></p>
+    </div>
+    <div class="viewer__media" data-media hidden></div>
+    <button class="nav-arrow nav-arrow--prev" data-act="prev" aria-label="Précédent">‹</button>
+    <button class="nav-arrow nav-arrow--next" data-act="next" aria-label="Suivant">›</button>
+    <div class="viewer__bar" data-bar hidden>
+      <span class="viewer__name" data-name></span>
+      <span class="viewer__counter" data-counter></span>
+    </div>
+  </div>
+
+  <!-- BOUTON PORTE : retour à la page d'accueil -->
+  <button class="door" data-go="accueil" title="Retour à l'accueil">
+    <svg class="door__svg" viewBox="0 0 60 92" aria-hidden="true">
+      <rect class="door__frame" x="1.5" y="1.5" width="57" height="89" rx="28.5" />
+      <rect class="door__panel" x="7" y="7" width="46" height="78" rx="23" />
+      <line class="door__line" x1="30" y1="20" x2="30" y2="72" />
+      <circle class="door__knob" cx="44" cy="48" r="2.6" />
+    </svg>
+    <span class="door__label">Accueil</span>
+  </button>
+</template>
+
+<script src="app.js"></script>
+</body>
+</html>
