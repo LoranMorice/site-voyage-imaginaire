@@ -14,7 +14,7 @@ cd "$(dirname "$0")" || exit 1
 SRC="$HOME/Desktop/Voyage-en-Imaginaire"
 DEST="medias"
 MAXPX=2000          # côté le plus long des images publiées, en pixels
-QUALITE=82          # qualité JPEG (1-100)
+QUALITE=88          # qualité JPEG (1-100)
 CAPTIONS="legendes.txt"
 
 fin() {
@@ -132,11 +132,34 @@ traiter() {
             continue
           fi
           ;;
-        jpg|jpeg|png)
+        jpg|jpeg)
           cible="$base"
           cp "$entree" "$sortie/$cible" 2>/dev/null || continue
           sips -Z "$MAXPX" "$sortie/$cible" >/dev/null 2>&1
           echo "  ✓ $base"
+          ;;
+        png)
+          # Un PNG est bien plus lourd qu'un JPEG à qualité visuelle égale.
+          # On le convertit — SAUF s'il contient de la transparence, qui
+          # deviendrait un fond noir en JPEG.
+          if [ "$(sips -g hasAlpha "$entree" 2>/dev/null | awk '/hasAlpha/{print $2}')" = "yes" ]; then
+            cible="$base"
+            cp "$entree" "$sortie/$cible" 2>/dev/null || continue
+            sips -Z "$MAXPX" "$sortie/$cible" >/dev/null 2>&1
+            echo "  ✓ $base — PNG conservé (transparence)"
+          else
+            cible="${base%.*}.jpg"
+            if sips -s format jpeg -s formatOptions "$QUALITE" -Z "$MAXPX" \
+                    "$entree" --out "$sortie/$cible" >/dev/null 2>&1; then
+              avant=$(( $(stat -f%z "$entree" 2>/dev/null || echo 0) / 1024 ))
+              apres=$(( $(stat -f%z "$sortie/$cible" 2>/dev/null || echo 0) / 1024 ))
+              echo "  ↻ $base → $cible   (${avant} Ko → ${apres} Ko)"
+              CONVERTIS=$((CONVERTIS + 1))
+            else
+              echo "  ✗ $base — conversion impossible, ignoré"
+              continue
+            fi
+          fi
           ;;
         gif|webp|svg|avif|bmp)
           # Copiés tels quels : retoucher un GIF animé le casserait
@@ -232,7 +255,7 @@ echo "   TERMINÉ"
 echo "═══════════════════════════════════════════════════════════"
 echo
 echo "   $TOTAL fichier(s) prêt(s) pour la publication"
-[ "$CONVERTIS" -gt 0 ] && echo "   $CONVERTIS image(s) HEIC/TIFF converties en JPEG"
+[ "$CONVERTIS" -gt 0 ] && echo "   $CONVERTIS image(s) converties en JPEG (HEIC, TIFF ou PNG)"
 echo "   Poids du dossier medias/ : ${POIDS:-0}"
 [ "$FUITE" -eq 0 ] && echo "   Contrôle : aucun fichier privé détecté ✓"
 echo

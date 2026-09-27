@@ -373,7 +373,12 @@ function initFallbackInput() {
     files.forEach((file) => {
       if (file.name.startsWith(".")) return;
       const parts = (file.webkitRelativePath || file.name).split("/");
-      const key = Object.keys(CATS).find((k) => parts.includes(CATS[k].dir));
+
+      // Le fichier doit se trouver DIRECTEMENT dans un des cinq dossiers.
+      // Un sous-dossier (originaux-HEIC, par exemple) est donc ignoré,
+      // exactement comme en mode atelier.
+      const parent = parts[parts.length - 2];
+      const key = Object.keys(CATS).find((k) => CATS[k].dir === parent);
       if (!key) return;
 
       // Fichier de légendes : on le lit au lieu de l'afficher.
@@ -803,6 +808,22 @@ async function renderView(cat) {
       const img = document.createElement("img");
       img.src = url;
       img.alt = captionOf(item);
+
+      // Un HEIC/HEIF n'est affichable par aucun navigateur : on l'explique
+      // plutôt que de laisser une image cassée.
+      img.addEventListener("error", () => {
+        const ext = extOf(item.name).toUpperCase();
+        fig.innerHTML =
+          '<div class="viewer__empty">' +
+          '<p class="viewer__empty-title">Image non affichable</p>' +
+          '<p class="viewer__empty-text"><code>' + item.name + "</code><br />" +
+          (ext === "HEIC" || ext === "HEIF"
+            ? "Le format HEIC n'est lu par aucun navigateur. Convertissez ce " +
+              "fichier en JPEG pour le voir ici."
+            : "Format " + ext + " refusé par le navigateur.") +
+          "</p></div>";
+      });
+
       fig.appendChild(img);
 
       const cap = document.createElement("figcaption");
