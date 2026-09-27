@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Diagnostic — Voyage en Imaginaire</title>
+<meta name="robots" content="noindex, nofollow" />
+<style>
+  body {
+    margin: 0; padding: 2rem 1.5rem;
+    font: 15px/1.6 -apple-system, system-ui, sans-serif;
+    background: #0d1020; color: #eceadf;
+  }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  h1 { font-size: 1.4rem; font-weight: 600; margin: 0 0 .3rem; }
+  p.sub { color: #98a0bb; margin: 0 0 1.8rem; font-size: .9rem; }
+  button {
+    font: inherit; font-weight: 500; cursor: pointer;
+    padding: .8rem 1.4rem; margin: 0 .5rem .5rem 0;
+    border: 0; border-radius: 9px;
+    background: #d8b26a; color: #14182c;
+  }
+  button.ghost { background: transparent; color: #cdd3e6; border: 1px solid #333a58; }
+  button:hover { filter: brightness(1.08); }
+  pre {
+    background: #151a30; border: 1px solid #2a3150; border-radius: 10px;
+    padding: 1.1rem; margin: 1.4rem 0 0;
+    white-space: pre-wrap; word-break: break-word;
+    font: 13px/1.65 ui-monospace, Menlo, monospace; color: #dfe4f2;
+  }
+  .ok   { color: #7fe0a4; }
+  .bad  { color: #ff9494; }
+  .warn { color: #ffcf7a; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Diagnostic du site</h1>
+  <p class="sub">Cette page n'affiche aucune image : elle vérifie seulement ce que le site
+  arrive à lire, et pourquoi.</p>
+
+  <button id="go">Relier mon dossier et analyser</button>
+  <button id="copy" class="ghost">Copier le rapport</button>
+
+  <pre id="out">Cliquez sur le bouton ci-dessus, puis choisissez le dossier
+« Voyage-en-Imaginaire » sur le Bureau.</pre>
+</div>
+
+<script>
+const CATS = {
+  photo:    { dir: "1-Photo",    kind: "image" },
+  graphi:   { dir: "2-Graphi",   kind: "image" },
+  audio:    { dir: "3-Audio",    kind: "audio" },
+  perso:    { dir: "4-Perso",    kind: "mixed" },
+  reserves: { dir: "5-Reserves", kind: "mixed" },
+};
+const EXT_IMAGE = ["jpg","jpeg","png","gif","webp","avif","svg","bmp","heic","heif","tif","tiff"];
+const EXT_AUDIO = ["mp3","wav","m4a","aac","ogg","oga","flac","opus","aiff","aif","wma"];
+
+const out = document.getElementById("out");
+let lines = [];
+const say = (t = "") => { lines.push(t); out.textContent = lines.join("\n"); };
+
+function extOf(n) { const i = n.lastIndexOf("."); return i < 0 ? "" : n.slice(i+1).toLowerCase(); }
+function fits(name, kind) {
+  const e = extOf(name);
+  if (kind === "image") return EXT_IMAGE.includes(e);
+  if (kind === "audio") return EXT_AUDIO.includes(e);
+  return EXT_IMAGE.includes(e) || EXT_AUDIO.includes(e);
+}
+
+async function contexte() {
+  lines = [];
+  say("═══ CONTEXTE ═══");
+  say("Adresse      : " + location.href);
+  say("Protocole    : " + location.protocol +
+      (location.protocol === "file:" ? "  (ouvert par double-clic)" : "  (servi par un serveur)"));
+  say("Navigateur   : " + navigator.userAgent);
+
+  const fs = typeof window.showDirectoryPicker === "function";
+  say("Lecture de dossier : " + (fs ? "OUI (Chrome/Edge)" : "NON (Firefox/Safari)"));
+
+  // catalogue.json accessible ?
+  try {
+    const r = await fetch("catalogue.json", { cache: "no-store" });
+    if (r.ok) {
+      const d = await r.json();
+      const n = Object.entries(d.onglets || {})
+        .map(([k, v]) => k + "=" + v.length).join("  ");
+      say("catalogue.json : LU  → " + n);
+      say("               → le site démarrerait en MODE PUBLIC");
+    } else {
+      say("catalogue.json : réponse " + r.status);
+    }
+  } catch (e) {
+    say("catalogue.json : non lisible (" + e.name + ")");
+    say("               → normal en file: ; le site démarre en MODE ATELIER");
+  }
+
+  // dossier mémorisé ?
+  try {
+    const db = await new Promise((res, rej) => {
+      const q = indexedDB.open("vei-store", 1);
+      q.onupgradeneeded = () => q.result.createObjectStore("kv");
+      q.onsuccess = () => res(q.result);
+      q.onerror = () => rej(q.error);
+    });
+    const h = await new Promise((res, rej) => {
+      const t = db.transaction("kv", "readonly").objectStore("kv").get("rootHandle");
+      t.onsuccess = () => res(t.result); t.onerror = () => rej(t.error);
+    });
+    if (!h) {
+      say("Dossier mémorisé : AUCUN  → il faut cliquer sur « Relier »");
+    } else {
+      const p = await h.queryPermission({ mode: "readwrite" });
+      say("Dossier mémorisé : « " + h.name + " »  permission=" + p);
+      if (p !== "granted") say("               → permission perdue, d'où les onglets vides");
+    }
+  } catch (e) {
+    say("Dossier mémorisé : illisible (" + e.name + " — " + e.message + ")");
+  }
+  say();
+}
+
+async function analyser(handle) {
+  say("═══ DOSSIER CHOISI ═══");
+  say("Nom : " + handle.name);
+  if (handle.name !== "Voyage-en-Imaginaire") {
+    say("⚠️  ATTENDU : « Voyage-en-Imaginaire »");
+  }
+  say();
+
+  let total = 0;
+  for (const [key, c] of Object.entries(CATS)) {
+    let dir;
+    try {
+      dir = await handle.getDirectoryHandle(c.dir);
+    } catch {
+      say(c.dir + " : SOUS-DOSSIER INTROUVABLE");
+      continue;
+    }
+
+    const noms = [], rejetes = [], dossiers = [];
+    for await (const e of dir.values()) {
+      if (e.kind === "directory") { dossiers.push(e.name); continue; }
+      if (e.name.startsWith(".")) continue;
+      if (e.name === "legendes.txt") continue;
+      if (fits(e.name, c.kind)) noms.push(e.name); else rejetes.push(e.name);
+    }
+
+    total += noms.length;
+    say(c.dir + " : " + noms.length + " affichable(s)" +
+        (rejetes.length ? "   " + rejetes.length + " rejeté(s)" : "") +
+        (dossiers.length ? "   " + dossiers.length + " sous-dossier(s) ignoré(s)" : ""));
+    noms.slice(0, 4).forEach(n => say("      • " + n));
+    if (noms.length > 4) say("      • … et " + (noms.length - 4) + " autre(s)");
+    rejetes.forEach(n => say("      ✗ rejeté : " + n));
+  }
+
+  say();
+  say("═══ RÉSULTAT ═══");
+  if (total > 0) {
+    say("Le site DOIT afficher " + total + " média(s).");
+    say("Si les onglets restent vides, le problème est à l'affichage,");
+    say("pas à la lecture des dossiers.");
+  } else {
+    say("Aucun média lisible trouvé : c'est la cause des onglets vides.");
+  }
+}
+
+document.getElementById("go").addEventListener("click", async () => {
+  await contexte();
+  if (typeof window.showDirectoryPicker !== "function") {
+    say("Ce navigateur ne sait pas ouvrir un dossier.");
+    say("Relancez ce diagnostic dans Google Chrome.");
+    return;
+  }
+  try {
+    const h = await window.showDirectoryPicker({ mode: "readwrite" });
+    await analyser(h);
+  } catch (e) {
+    say("Sélection annulée (" + e.name + ")");
+  }
+});
+
+document.getElementById("copy").addEventListener("click", () => {
+  navigator.clipboard.writeText(out.textContent)
+    .then(() => { const b = document.getElementById("copy"); b.textContent = "Copié ✓";
+                  setTimeout(() => b.textContent = "Copier le rapport", 1800); });
+});
+
+window.addEventListener("error", e => say("⚠️ ERREUR JS : " + e.message));
+</script>
+</body>
+</html>

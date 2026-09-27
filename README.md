@@ -174,6 +174,41 @@ de VS Code : clic droit sur `index.html` → *Open with Live Server*.
 
 ---
 
+## 7 bis. En cas de problème
+
+### Les onglets s'affichent vides alors que les dossiers sont pleins
+
+C'est le cas le plus fréquent. Chrome a perdu l'autorisation d'accès au
+dossier — cela arrive quand le site est ouvert par double-clic, car l'adresse
+`file://` n'a pas d'identité stable.
+
+1. `Cmd + Maj + R` pour recharger en vidant le cache
+2. Recliquer sur **Relier mon dossier** et resélectionner
+   `Voyage-en-Imaginaire`
+
+Le point en bas à gauche doit passer au **vert**, et les compteurs apparaître
+en face des onglets.
+
+**Pour l'éviter durablement : ouvrez le site avec Live Server** plutôt que par
+double-clic (clic droit sur `index.html` → *Open with Live Server*).
+L'adresse devient `http://localhost:5500`, que Chrome reconnaît d'une fois à
+l'autre. Avantage supplémentaire : vous voyez alors le site tel que vos
+visiteurs le verront.
+
+### L'outil de diagnostic
+
+`diagnostic.html` — à ouvrir dans Chrome en cas de doute. Il indique :
+
+- si le dossier est mémorisé et si l'autorisation tient toujours
+- combien de fichiers sont trouvés dans chacun des cinq dossiers
+- lesquels sont rejetés, et pour quelle raison
+- si le site démarre en mode atelier ou en mode public
+
+Un bouton copie le rapport, prêt à être collé dans une conversation.
+Cette page n'affiche aucun média et aucun lien du site n'y conduit.
+
+---
+
 ## 8. Personnaliser
 
 **`styles.css`**, bloc `:root` :
