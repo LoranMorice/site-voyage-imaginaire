@@ -1,6 +1,6 @@
 {
   "_note": "Fichier généré par publier.command — ne pas modifier à la main.",
-  "genere": "27/09/2026 16:27",
+  "genere": "27/09/2026 16:53",
   "onglets": {
     "photo": [
       {
@@ -147,6 +147,11 @@
       }
     ],
     "audio": [
+      {
+        "nom": "Projet du siecle 1-2 copie MP3.mp3",
+        "fichier": "medias/audio/Projet du siecle 1-2 copie MP3.mp3",
+        "legende": "Projet du siècle"
+      }
     ]
   }
 }
