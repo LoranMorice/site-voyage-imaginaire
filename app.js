@@ -264,6 +264,19 @@ async function connectFolder() {
 
   try {
     const handle = await window.showDirectoryPicker({ id: "vei-root", mode: "readwrite" });
+
+    // VÉRIFICATION : le dossier choisi doit être la racine, celle qui
+    // contient 1-Photo, 2-Graphi, etc. Sans ce contrôle, sélectionner un
+    // sous-dossier par erreur y ferait créer cinq dossiers fantômes.
+    if (!(await isRootFolder(handle))) {
+      toast(
+        "Ce n'est pas le bon dossier. Choisissez « " + CONFIG.ROOT_FOLDER +
+        " », celui qui contient 1-Photo, 2-Graphi, 3-Audio…",
+        6000
+      );
+      return;
+    }
+
     state.rootHandle = handle;
     state.mode = "fs";
     await idbSet("rootHandle", handle);
@@ -274,6 +287,20 @@ async function connectFolder() {
   }
 }
 
+/**
+ * Le dossier donné est-il bien la racine de la base ?
+ * On l'admet dès qu'au moins un des cinq sous-dossiers attendus s'y trouve.
+ */
+async function isRootFolder(handle) {
+  for (const key of Object.keys(CATS)) {
+    try {
+      await handle.getDirectoryHandle(CATS[key].dir);
+      return true;
+    } catch { /* ce sous-dossier manque, on essaie le suivant */ }
+  }
+  return false;
+}
+
 /** Tente de retrouver le dossier relié lors d'une visite précédente. */
 async function restoreFolder() {
   if (!supportsFS) return false;
@@ -282,6 +309,14 @@ async function restoreFolder() {
 
   const perm = await handle.queryPermission({ mode: "readwrite" });
   if (perm !== "granted") return false;     // il faudra recliquer sur « Relier »
+
+  // Le dossier mémorisé lors d'une visite précédente peut être le mauvais.
+  // On le vérifie plutôt que de l'utiliser aveuglément, et on l'oublie
+  // s'il ne contient aucun des cinq sous-dossiers attendus.
+  if (!(await isRootFolder(handle))) {
+    await idbSet("rootHandle", null);
+    return false;
+  }
 
   state.rootHandle = handle;
   state.mode = "fs";
@@ -417,7 +452,8 @@ async function scanAll() {
   for (const key of Object.keys(CATS)) {
     state.catalog[key] = [];
     try {
-      const dir = await state.rootHandle.getDirectoryHandle(CATS[key].dir, { create: true });
+      // create: false — le site ne doit jamais fabriquer de dossier.
+      const dir = await state.rootHandle.getDirectoryHandle(CATS[key].dir);
       for await (const entry of dir.values()) {
         if (entry.kind !== "file" || entry.name.startsWith(".")) continue;
         if (!fitsCat(entry.name, key)) continue;
@@ -448,7 +484,7 @@ async function scanCat(cat) {
 
   const fresh = [];
   try {
-    const dir = await state.rootHandle.getDirectoryHandle(CATS[cat].dir, { create: true });
+    const dir = await state.rootHandle.getDirectoryHandle(CATS[cat].dir);
     for await (const entry of dir.values()) {
       if (entry.kind !== "file" || entry.name.startsWith(".")) continue;
       if (!fitsCat(entry.name, cat)) continue;
