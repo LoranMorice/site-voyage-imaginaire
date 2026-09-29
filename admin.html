@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex, nofollow" />
+<title>Légendes — administration · Voyage en Imaginaire</title>
+<style>
+  :root {
+    --ink: #0d1020; --panel: #141a30; --line: #2a3150;
+    --text: #eceadf; --muted: #98a0bb; --gold: #d8b26a;
+    --gold-soft: rgba(216,178,106,.16); --ok: #7fe0a4; --bad: #ff9494;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--ink); color: var(--text);
+    font: 15px/1.55 -apple-system, system-ui, sans-serif;
+  }
+  a { color: var(--gold); }
+
+  /* ---------- Portail ---------- */
+  .gate { min-height: 100vh; display: grid; place-items: center; padding: 2rem; }
+  .gate__box {
+    width: 100%; max-width: 380px; text-align: center;
+    background: var(--panel); border: 1px solid var(--line);
+    border-radius: 14px; padding: 2rem 1.7rem;
+  }
+  .gate__box h1 { font-size: 1.3rem; margin: 0 0 .3rem; }
+  .gate__box p  { color: var(--muted); font-size: .88rem; margin: 0 0 1.4rem; }
+  input[type=password], input[type=text] {
+    width: 100%; padding: .75rem .9rem; font: inherit;
+    color: var(--text); background: rgba(255,255,255,.05);
+    border: 1px solid var(--line); border-radius: 9px; outline: none;
+  }
+  input:focus { border-color: var(--gold); box-shadow: 0 0 0 3px var(--gold-soft); }
+  button {
+    font: inherit; font-weight: 600; cursor: pointer; border: 0;
+    padding: .72rem 1.3rem; border-radius: 9px;
+    background: var(--gold); color: #14182c;
+  }
+  button.ghost { background: transparent; color: var(--text); border: 1px solid var(--line); font-weight: 500; }
+  button:hover { filter: brightness(1.07); }
+  button:disabled { opacity: .45; cursor: default; filter: none; }
+  .err { color: var(--bad); font-size: .85rem; margin: .8rem 0 0; min-height: 1.1em; }
+
+  /* ---------- Barre du haut ---------- */
+  .app { display: none; }
+  .bar {
+    position: sticky; top: 0; z-index: 10;
+    display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;
+    padding: .9rem 1.2rem; background: var(--panel);
+    border-bottom: 1px solid var(--line);
+  }
+  .bar h1 { font-size: 1.05rem; margin: 0; flex: 1; }
+  .bar .status { font-size: .82rem; color: var(--muted); }
+  .bar .dot { display:inline-block; width:8px; height:8px; border-radius:50%; background:#6b7080; margin-right:.4rem; }
+  .bar .dot.on { background: var(--ok); box-shadow: 0 0 8px rgba(127,224,164,.7); }
+
+  /* ---------- Onglets ---------- */
+  .tabs { display: flex; gap: .4rem; flex-wrap: wrap; padding: 1rem 1.2rem 0; }
+  .tabs button {
+    background: transparent; color: var(--muted);
+    border: 1px solid var(--line); font-weight: 500;
+    padding: .5rem .9rem; border-radius: 999px;
+  }
+  .tabs button.active { background: var(--gold-soft); color: var(--text); border-color: var(--gold); }
+  .tabs button .n { color: var(--gold); font-size: .8rem; }
+
+  /* ---------- Grille de vignettes ---------- */
+  .grid {
+    display: grid; gap: 1.1rem; padding: 1.2rem;
+    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  }
+  .card {
+    background: var(--panel); border: 1px solid var(--line);
+    border-radius: 12px; overflow: hidden; display: flex; flex-direction: column;
+  }
+  .thumb {
+    aspect-ratio: 4 / 3; background: #0a0d1a; display: grid; place-items: center;
+    overflow: hidden; position: relative;
+  }
+  .thumb img { width: 100%; height: 100%; object-fit: cover; }
+  .thumb .audio { font-size: 2.6rem; }
+  .thumb .none { color: var(--muted); font-size: .8rem; text-align: center; padding: 1rem; }
+  .card__body { padding: .7rem .8rem .8rem; display: flex; flex-direction: column; gap: .45rem; }
+  .card__name { font-size: .74rem; color: var(--muted); word-break: break-word; }
+  .card__cap {
+    /* Le champ « type ........... encadré » demandé */
+    width: 100%; padding: .55rem .65rem; font: inherit; font-size: .9rem;
+    color: var(--text); background: rgba(255,255,255,.04);
+    border: 1px solid var(--line); border-radius: 8px; outline: none;
+    border-bottom: 2px dotted var(--gold);
+  }
+  .card__cap:focus { border-color: var(--gold); box-shadow: 0 0 0 3px var(--gold-soft); }
+  .card.dirty { border-color: var(--gold); }
+  .card.dirty .card__name::after { content: " •"; color: var(--gold); }
+
+  /* ---------- Pied d'action ---------- */
+  .actions {
+    position: sticky; bottom: 0; z-index: 10;
+    display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;
+    padding: .9rem 1.2rem; background: var(--panel);
+    border-top: 1px solid var(--line);
+  }
+  .actions .msg { flex: 1; font-size: .85rem; color: var(--muted); }
+  .empty { padding: 3rem 1.2rem; text-align: center; color: var(--muted); }
+  .warn { padding: .8rem 1.2rem; background: rgba(255,148,148,.1); color: #ffb3b3; font-size: .85rem; }
+</style>
+</head>
+<body>
+
+<!-- ================= PORTAIL ADMIN ================= -->
+<div class="gate" id="gate">
+  <div class="gate__box">
+    <h1>Administration des légendes</h1>
+    <p>Accès réservé. Saisissez le mot de passe.</p>
+    <form id="gateForm" autocomplete="off">
+      <input type="password" id="pass" placeholder="••••••••••••" required />
+      <p class="err" id="gateErr"></p>
+      <button type="submit" style="width:100%">Entrer</button>
+    </form>
+  </div>
+</div>
+
+<!-- ================= APPLICATION ================= -->
+<div class="app" id="app">
+  <div class="bar">
+    <h1>Légendes</h1>
+    <span class="status"><span class="dot" id="dot"></span><span id="statusText">Dossier non relié</span></span>
+    <button class="ghost" id="connect">Relier le dossier</button>
+  </div>
+
+  <div id="fsWarn" class="warn" style="display:none">
+    Ce navigateur ne permet pas d'enregistrer directement dans les dossiers.
+    Ouvrez cette page avec <b>Google Chrome</b> pour l'édition en direct.
+  </div>
+
+  <div class="tabs" id="tabs"></div>
+  <div class="grid" id="grid"></div>
+  <div class="empty" id="empty" style="display:none"></div>
+
+  <div class="actions">
+    <span class="msg" id="msg">Choisissez un dossier, saisissez les légendes, puis Enregistrer.</span>
+    <button class="ghost" id="reload">Recharger</button>
+    <button id="save" disabled>Enregistrer ce dossier</button>
+  </div>
+</div>
+
+<script>
+"use strict";
+
+/* ---- Configuration, alignée sur le site ---- */
+const CONFIG = { MINUTE_TOLERANCE: 3, CAPTIONS_FILE: "legendes.txt" };
+const CATS = {
+  photo:    { label: "Photo",    num: "1", dir: "1-Photo",    kind: "image" },
+  graphi:   { label: "Graphi",   num: "2", dir: "2-Graphi",   kind: "image" },
+  audio:    { label: "Audio",    num: "3", dir: "3-Audio",    kind: "audio" },
+  perso:    { label: "Perso",    num: "4", dir: "4-Perso",    kind: "mixed" },
+  reserves: { label: "Réserves", num: "5", dir: "5-Reserves", kind: "mixed" },
+};
+const EXT_IMAGE = ["jpg","jpeg","png","gif","webp","avif","svg","bmp"];
+const EXT_AUDIO = ["mp3","wav","m4a","aac","ogg","oga","flac","opus","aiff","aif","wma"];
+
+const $ = (s, r=document) => r.querySelector(s);
+const pad = n => String(n).padStart(2,"0");
+
+/* ---- Mot de passe horaire (identique à Perso/Réserves) ---- */
+function minuteCode(d){ return pad(d.getDate())+pad(d.getMonth()+1)+d.getFullYear()+pad(d.getHours())+":"+pad(d.getMinutes()); }
+function passOk(raw){
+  const clean = String(raw).replace(/[^0-9]/g,"");
+  const now = Date.now();
+  for (let i=-CONFIG.MINUTE_TOLERANCE; i<=CONFIG.MINUTE_TOLERANCE; i++){
+    if (clean === minuteCode(new Date(now+i*60000)).replace(":","")) return true;
+  }
+  return false;
+}
+
+function extOf(n){ const i=n.lastIndexOf("."); return i<0?"":n.slice(i+1).toLowerCase(); }
+const isImage = n => EXT_IMAGE.includes(extOf(n));
+const isAudio = n => EXT_AUDIO.includes(extOf(n));
+function fits(name, kind){
+  if (kind==="image") return isImage(name);
+  if (kind==="audio") return isAudio(name);
+  return isImage(name) || isAudio(name);
+}
+
+/* ---- Lecture/écriture du fichier legendes.txt ---- */
+function parseCaptions(txt){
+  const map = new Map();
+  txt.split(/\r?\n/).forEach(line=>{
+    const row = line.trim();
+    if (!row || row.startsWith("#")) return;
+    const cand = [row.indexOf("="), row.indexOf("|")].filter(i=>i>0);
+    if (!cand.length) return;
+    const sep = Math.min(...cand);
+    const file = row.slice(0,sep).trim().toLowerCase();
+    const text = row.slice(sep+1).trim();
+    if (file) map.set(file, text);
+  });
+  return map;
+}
+/* Reconstruit le fichier : en-tête + une ligne par média porteur de légende. */
+function buildCaptions(items){
+  const head =
+    "# Légendes — généré par l'outil d'administration.\n" +
+    "# Une ligne par fichier :  nom = légende\n\n";
+  const lines = items
+    .filter(it => it.caption.trim())
+    .map(it => it.name + " = " + it.caption.trim());
+  return head + lines.join("\n") + (lines.length ? "\n" : "");
+}
+
+/* ---- État ---- */
+const supportsFS = typeof window.showDirectoryPicker === "function";
+const state = { root:null, cat:"photo", items:[], urls:[] };
+
+function releaseUrls(){ state.urls.forEach(URL.revokeObjectURL); state.urls = []; }
+
+/* ---- Portail ---- */
+$("#gateForm").addEventListener("submit", e=>{
+  e.preventDefault();
+  if (passOk($("#pass").value)){
+    $("#gate").style.display = "none";
+    $("#app").style.display = "block";
+    if (!supportsFS) $("#fsWarn").style.display = "block";
+    buildTabs();
+  } else {
+    $("#gateErr").textContent = "Mot de passe incorrect.";
+    $("#pass").value = ""; $("#pass").focus();
+  }
+});
+
+/* ---- Onglets ---- */
+function buildTabs(){
+  const box = $("#tabs"); box.innerHTML = "";
+  Object.entries(CATS).forEach(([key,c])=>{
+    const b = document.createElement("button");
+    b.innerHTML = '<span class="n">'+c.num+'</span> '+c.label;
+    b.className = key===state.cat ? "active" : "";
+    b.onclick = ()=>{ if (confirmLeave()){ state.cat=key; buildTabs(); render(); } };
+    box.appendChild(b);
+  });
+}
+
+/* ---- Liaison dossier ---- */
+$("#connect").addEventListener("click", connect);
+async function connect(){
+  if (!supportsFS){ alert("Ouvrez cette page avec Google Chrome pour relier un dossier."); return; }
+  try {
+    const h = await window.showDirectoryPicker({ id:"vei-root", mode:"readwrite" });
+    // Vérifie qu'il s'agit bien de la racine
+    let ok = false;
+    for (const c of Object.values(CATS)){
+      try { await h.getDirectoryHandle(c.dir); ok = true; break; } catch {}
+    }
+    if (!ok){ setStatus(false, "Ce n'est pas le bon dossier"); return; }
+    state.root = h;
+    setStatus(true, h.name);
+    await render();
+  } catch(e){ if (e.name!=="AbortError") setStatus(false, "Liaison annulée"); }
+}
+function setStatus(on, txt){
+  $("#dot").className = "dot" + (on?" on":"");
+  $("#statusText").textContent = txt;
+}
+
+/* ---- Chargement d'un dossier ---- */
+async function render(){
+  releaseUrls();
+  const grid = $("#grid"), empty = $("#empty");
+  grid.innerHTML = ""; empty.style.display = "none";
+  $("#save").disabled = true;
+
+  if (!state.root){
+    empty.style.display = "block";
+    empty.textContent = "Reliez d'abord le dossier Voyage-en-Imaginaire.";
+    return;
+  }
+
+  const c = CATS[state.cat];
+  let dir;
+  try { dir = await state.root.getDirectoryHandle(c.dir); }
+  catch { empty.style.display="block"; empty.textContent="Dossier "+c.dir+" introuvable."; return; }
+
+  // Légendes existantes
+  let caps = new Map();
+  try {
+    const fh = await dir.getFileHandle(CONFIG.CAPTIONS_FILE);
+    caps = parseCaptions(await (await fh.getFile()).text());
+  } catch {}
+
+  // Fichiers médias
+  const items = [];
+  for await (const e of dir.values()){
+    if (e.kind!=="file" || e.name.startsWith(".")) continue;
+    if (e.name === CONFIG.CAPTIONS_FILE) continue;
+    if (!fits(e.name, c.kind)) continue;
+    items.push({ name:e.name, handle:e, caption: caps.get(e.name.toLowerCase()) || "" });
+  }
+  items.sort((a,b)=>a.name.localeCompare(b.name,"fr",{numeric:true}));
+  state.items = items;
+  state.dir = dir;
+
+  if (!items.length){
+    empty.style.display = "block";
+    empty.textContent = "Aucun fichier dans "+c.dir+".";
+    $("#msg").textContent = "";
+    return;
+  }
+
+  for (const it of items) grid.appendChild(await makeCard(it, c.kind));
+  $("#save").disabled = false;
+  $("#msg").textContent = items.length + " fichier(s). Les modifiés sont marqués d'un point.";
+}
+
+async function makeCard(item, kind){
+  const card = document.createElement("div");
+  card.className = "card";
+
+  const thumb = document.createElement("div");
+  thumb.className = "thumb";
+  if (isImage(item.name)){
+    try {
+      const file = await item.handle.getFile();
+      const url = URL.createObjectURL(file); state.urls.push(url);
+      const img = document.createElement("img"); img.src = url; img.alt = item.name;
+      img.onerror = ()=>{ thumb.innerHTML = '<div class="none">Aperçu impossible<br>('+extOf(item.name).toUpperCase()+')</div>'; };
+      thumb.appendChild(img);
+    } catch { thumb.innerHTML = '<div class="none">Illisible</div>'; }
+  } else if (isAudio(item.name)){
+    thumb.innerHTML = '<div class="audio">🎵</div>';
+  } else {
+    thumb.innerHTML = '<div class="none">—</div>';
+  }
+  card.appendChild(thumb);
+
+  const body = document.createElement("div");
+  body.className = "card__body";
+  const name = document.createElement("div");
+  name.className = "card__name"; name.textContent = item.name;
+  const cap = document.createElement("input");
+  cap.type = "text"; cap.className = "card__cap";
+  cap.placeholder = "Légende…"; cap.value = item.caption;
+  cap.addEventListener("input", ()=>{
+    item.caption = cap.value;
+    card.classList.toggle("dirty", cap.value !== (item._saved ?? item.caption));
+  });
+  item._saved = item.caption;
+  body.appendChild(name); body.appendChild(cap);
+  card.appendChild(body);
+  return card;
+}
+
+/* ---- Enregistrement ---- */
+$("#save").addEventListener("click", save);
+async function save(){
+  if (!state.dir) return;
+  $("#save").disabled = true;
+  $("#msg").textContent = "Enregistrement…";
+  try {
+    const fh = await state.dir.getFileHandle(CONFIG.CAPTIONS_FILE, { create:true });
+    const w = await fh.createWritable();
+    await w.write(buildCaptions(state.items));
+    await w.close();
+    state.items.forEach(it => it._saved = it.caption);
+    document.querySelectorAll(".card").forEach(c=>c.classList.remove("dirty"));
+    const n = state.items.filter(it=>it.caption.trim()).length;
+    $("#msg").textContent = "✓ Enregistré dans "+CATS[state.cat].dir+"/legendes.txt — "+n+" légende(s).";
+  } catch(e){
+    $("#msg").textContent = "Échec : "+(e.message||e.name);
+  }
+  $("#save").disabled = false;
+}
+
+$("#reload").addEventListener("click", ()=>{ if (confirmLeave()) render(); });
+
+function confirmLeave(){
+  const dirty = state.items.some(it => it.caption !== (it._saved ?? it.caption));
+  return !dirty || confirm("Des légendes non enregistrées seront perdues. Continuer ?");
+}
+window.addEventListener("beforeunload", e=>{
+  if (state.items.some(it => it.caption !== (it._saved ?? it.caption))){ e.preventDefault(); e.returnValue=""; }
+});
+</script>
+</body>
+</html>
