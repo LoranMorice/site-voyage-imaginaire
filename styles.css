@@ -303,6 +303,21 @@ kbd {
 
 .rail__link:hover { color: var(--text); border-color: var(--gold); }
 
+/* Bouton « Légendes (admin) » : discret, avec une clé dorée. */
+.rail__link--admin { margin-top: 0.4rem; }
+.rail__link--admin:hover { border-color: var(--gold); }
+.rail__admin-key { font-size: 0.82rem; filter: grayscale(0.2); }
+
+/* Ligne de version, tout en bas du menu. */
+.rail__version {
+  margin: 0.7rem 0 0;
+  font-size: 0.6rem;
+  letter-spacing: 0.08em;
+  text-align: center;
+  color: var(--muted);
+  opacity: 0.5;
+}
+
 #connectLabel {
   overflow: hidden;
   text-overflow: ellipsis;

@@ -4,12 +4,12 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <meta name="robots" content="noindex, nofollow" />
-<title>Légendes — administration · Voyage en Imaginaire</title>
+<title>Admin légendes — Voyage en Imaginaire</title>
 <style>
   :root {
-    --ink: #0d1020; --panel: #141a30; --line: #2a3150;
+    --ink: #0d1020; --ink2: #151a30; --line: #2a3150;
     --text: #eceadf; --muted: #98a0bb; --gold: #d8b26a;
-    --gold-soft: rgba(216,178,106,.16); --ok: #7fe0a4; --bad: #ff9494;
+    --gold-soft: rgba(216,178,106,.16);
   }
   * { box-sizing: border-box; }
   body {
@@ -18,368 +18,420 @@
   }
   a { color: var(--gold); }
 
-  /* ---------- Portail ---------- */
-  .gate { min-height: 100vh; display: grid; place-items: center; padding: 2rem; }
+  /* ---------- Écran de connexion ---------- */
+  .gate { position: fixed; inset: 0; display: grid; place-items: center; padding: 1.5rem; }
   .gate__box {
     width: 100%; max-width: 380px; text-align: center;
-    background: var(--panel); border: 1px solid var(--line);
-    border-radius: 14px; padding: 2rem 1.7rem;
+    background: var(--ink2); border: 1px solid var(--line);
+    border-radius: 14px; padding: 2rem 1.6rem;
   }
-  .gate__box h1 { font-size: 1.3rem; margin: 0 0 .3rem; }
-  .gate__box p  { color: var(--muted); font-size: .88rem; margin: 0 0 1.4rem; }
+  .gate__box h1 { font-size: 1.25rem; margin: 0 0 .3rem; }
+  .gate__box p { color: var(--muted); font-size: .86rem; margin: 0 0 1.4rem; }
   input[type=password], input[type=text] {
-    width: 100%; padding: .75rem .9rem; font: inherit;
-    color: var(--text); background: rgba(255,255,255,.05);
+    width: 100%; padding: .7rem .9rem; font: inherit;
+    background: rgba(255,255,255,.04); color: var(--text);
     border: 1px solid var(--line); border-radius: 9px; outline: none;
   }
   input:focus { border-color: var(--gold); box-shadow: 0 0 0 3px var(--gold-soft); }
   button {
-    font: inherit; font-weight: 600; cursor: pointer; border: 0;
-    padding: .72rem 1.3rem; border-radius: 9px;
+    font: inherit; font-weight: 500; cursor: pointer; border: 0;
+    padding: .7rem 1.3rem; border-radius: 9px;
     background: var(--gold); color: #14182c;
   }
-  button.ghost { background: transparent; color: var(--text); border: 1px solid var(--line); font-weight: 500; }
-  button:hover { filter: brightness(1.07); }
-  button:disabled { opacity: .45; cursor: default; filter: none; }
-  .err { color: var(--bad); font-size: .85rem; margin: .8rem 0 0; min-height: 1.1em; }
+  button:hover { filter: brightness(1.08); }
+  button.ghost { background: transparent; color: var(--text); border: 1px solid var(--line); }
+  .gate__box button { width: 100%; margin-top: .8rem; }
+  .err { color: #ff9494; font-size: .84rem; margin-top: .7rem; min-height: 1.1em; }
 
   /* ---------- Barre du haut ---------- */
-  .app { display: none; }
-  .bar {
+  header {
     position: sticky; top: 0; z-index: 10;
     display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;
-    padding: .9rem 1.2rem; background: var(--panel);
+    padding: .9rem 1.3rem; background: var(--ink2);
     border-bottom: 1px solid var(--line);
   }
-  .bar h1 { font-size: 1.05rem; margin: 0; flex: 1; }
-  .bar .status { font-size: .82rem; color: var(--muted); }
-  .bar .dot { display:inline-block; width:8px; height:8px; border-radius:50%; background:#6b7080; margin-right:.4rem; }
-  .bar .dot.on { background: var(--ok); box-shadow: 0 0 8px rgba(127,224,164,.7); }
+  header h1 { font-size: 1.02rem; margin: 0; font-weight: 600; }
+  header .sub { color: var(--muted); font-size: .8rem; }
+  header .spacer { flex: 1; }
+  .status { font-size: .82rem; color: var(--muted); }
+  .status.saved { color: #7fe0a4; }
+  .status.dirty { color: var(--gold); }
 
   /* ---------- Onglets ---------- */
-  .tabs { display: flex; gap: .4rem; flex-wrap: wrap; padding: 1rem 1.2rem 0; }
+  .tabs { display: flex; gap: .4rem; flex-wrap: wrap; padding: .9rem 1.3rem 0; }
   .tabs button {
     background: transparent; color: var(--muted);
-    border: 1px solid var(--line); font-weight: 500;
-    padding: .5rem .9rem; border-radius: 999px;
+    border: 1px solid var(--line); border-radius: 999px;
+    padding: .4rem .95rem; font-size: .84rem;
   }
-  .tabs button.active { background: var(--gold-soft); color: var(--text); border-color: var(--gold); }
-  .tabs button .n { color: var(--gold); font-size: .8rem; }
+  .tabs button.on { background: var(--gold-soft); color: var(--text); border-color: var(--gold); }
+  .tabs .count { opacity: .6; font-variant-numeric: tabular-nums; }
 
-  /* ---------- Grille de vignettes ---------- */
+  /* ---------- Grille ---------- */
+  main { padding: 1.2rem 1.3rem 4rem; }
   .grid {
-    display: grid; gap: 1.1rem; padding: 1.2rem;
+    display: grid; gap: 1.1rem;
     grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
   }
   .card {
-    background: var(--panel); border: 1px solid var(--line);
+    background: var(--ink2); border: 1px solid var(--line);
     border-radius: 12px; overflow: hidden; display: flex; flex-direction: column;
   }
   .thumb {
-    aspect-ratio: 4 / 3; background: #0a0d1a; display: grid; place-items: center;
-    overflow: hidden; position: relative;
+    height: 150px; display: grid; place-items: center;
+    background: repeating-linear-gradient(45deg, rgba(255,255,255,.02) 0 10px, transparent 10px 20px), #0f1326;
+    overflow: hidden;
   }
   .thumb img { width: 100%; height: 100%; object-fit: cover; }
-  .thumb .audio { font-size: 2.6rem; }
-  .thumb .none { color: var(--muted); font-size: .8rem; text-align: center; padding: 1rem; }
-  .card__body { padding: .7rem .8rem .8rem; display: flex; flex-direction: column; gap: .45rem; }
-  .card__name { font-size: .74rem; color: var(--muted); word-break: break-word; }
-  .card__cap {
-    /* Le champ « type ........... encadré » demandé */
-    width: 100%; padding: .55rem .65rem; font: inherit; font-size: .9rem;
-    color: var(--text); background: rgba(255,255,255,.04);
+  .thumb.audio { font-size: 2.4rem; }
+  .thumb .disc {
+    width: 78px; height: 78px; border-radius: 50%;
+    background: radial-gradient(circle, #0f1326 0 18%, transparent 18.5%),
+                conic-gradient(from 0deg, var(--gold), #7a5f2f, var(--gold), #7a5f2f, var(--gold));
+  }
+  .card__body { padding: .7rem .75rem .85rem; display: flex; flex-direction: column; gap: .45rem; }
+  .card__name {
+    font-size: .74rem; color: var(--muted); word-break: break-word;
+    font-variant-numeric: tabular-nums;
+  }
+  /* Champ légende encadré, en dessous de la vignette */
+  .card textarea {
+    width: 100%; min-height: 58px; resize: vertical; font: inherit; font-size: .88rem;
+    padding: .55rem .65rem; color: var(--text);
+    background: rgba(255,255,255,.03);
     border: 1px solid var(--line); border-radius: 8px; outline: none;
-    border-bottom: 2px dotted var(--gold);
   }
-  .card__cap:focus { border-color: var(--gold); box-shadow: 0 0 0 3px var(--gold-soft); }
-  .card.dirty { border-color: var(--gold); }
-  .card.dirty .card__name::after { content: " •"; color: var(--gold); }
+  .card textarea:focus { border-color: var(--gold); box-shadow: 0 0 0 3px var(--gold-soft); }
+  .card.changed textarea { border-color: var(--gold); }
 
-  /* ---------- Pied d'action ---------- */
-  .actions {
-    position: sticky; bottom: 0; z-index: 10;
-    display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;
-    padding: .9rem 1.2rem; background: var(--panel);
-    border-top: 1px solid var(--line);
+  .empty { color: var(--muted); padding: 2rem 0; text-align: center; }
+  footer {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    display: flex; align-items: center; gap: 1rem;
+    padding: .8rem 1.3rem; background: var(--ink2); border-top: 1px solid var(--line);
   }
-  .actions .msg { flex: 1; font-size: .85rem; color: var(--muted); }
-  .empty { padding: 3rem 1.2rem; text-align: center; color: var(--muted); }
-  .warn { padding: .8rem 1.2rem; background: rgba(255,148,148,.1); color: #ffb3b3; font-size: .85rem; }
+  footer .spacer { flex: 1; }
+  .toast {
+    position: fixed; left: 50%; bottom: 5rem; transform: translateX(-50%);
+    background: var(--ink2); border: 1px solid var(--gold-soft);
+    border-radius: 999px; padding: .7rem 1.3rem; font-size: .86rem;
+    box-shadow: 0 14px 40px rgba(0,0,0,.5); z-index: 50;
+  }
+  [hidden] { display: none !important; }
 </style>
 </head>
 <body>
 
-<!-- ================= PORTAIL ADMIN ================= -->
+<!-- ================= CONNEXION ================= -->
 <div class="gate" id="gate">
   <div class="gate__box">
-    <h1>Administration des légendes</h1>
-    <p>Accès réservé. Saisissez le mot de passe.</p>
+    <h1>Console des légendes</h1>
+    <p>Accès réservé — mot de passe des onglets protégés.</p>
     <form id="gateForm" autocomplete="off">
-      <input type="password" id="pass" placeholder="••••••••••••" required />
-      <p class="err" id="gateErr"></p>
-      <button type="submit" style="width:100%">Entrer</button>
+      <input type="password" id="pass" placeholder="••••••••••••••" required />
+      <div class="err" id="gateErr"></div>
+      <button type="submit">Entrer</button>
     </form>
   </div>
 </div>
 
 <!-- ================= APPLICATION ================= -->
-<div class="app" id="app">
-  <div class="bar">
-    <h1>Légendes</h1>
-    <span class="status"><span class="dot" id="dot"></span><span id="statusText">Dossier non relié</span></span>
-    <button class="ghost" id="connect">Relier le dossier</button>
-  </div>
-
-  <div id="fsWarn" class="warn" style="display:none">
-    Ce navigateur ne permet pas d'enregistrer directement dans les dossiers.
-    Ouvrez cette page avec <b>Google Chrome</b> pour l'édition en direct.
-  </div>
+<div id="app" hidden>
+  <header>
+    <div>
+      <h1>Console des légendes</h1>
+      <div class="sub">Voyage en Imaginaire — LoranG</div>
+    </div>
+    <div class="spacer"></div>
+    <span class="status" id="status">Reliez votre dossier pour commencer</span>
+    <button id="connect">Relier mon dossier</button>
+  </header>
 
   <div class="tabs" id="tabs"></div>
-  <div class="grid" id="grid"></div>
-  <div class="empty" id="empty" style="display:none"></div>
 
-  <div class="actions">
-    <span class="msg" id="msg">Choisissez un dossier, saisissez les légendes, puis Enregistrer.</span>
-    <button class="ghost" id="reload">Recharger</button>
-    <button id="save" disabled>Enregistrer ce dossier</button>
-  </div>
+  <main>
+    <div class="grid" id="grid"></div>
+    <div class="empty" id="empty" hidden></div>
+  </main>
+
+  <footer>
+    <span class="sub" id="foot">—</span>
+    <div class="spacer"></div>
+    <button class="ghost" id="reload">Recharger depuis le disque</button>
+    <button id="save">Enregistrer cet onglet</button>
+  </footer>
 </div>
+
+<div class="toast" id="toast" hidden></div>
 
 <script>
 "use strict";
 
-/* ---- Configuration, alignée sur le site ---- */
-const CONFIG = { MINUTE_TOLERANCE: 3, CAPTIONS_FILE: "legendes.txt" };
+/* ---- Réglages, alignés sur app.js ---- */
+const CAPTIONS_FILE = "legendes.txt";
+const MINUTE_TOLERANCE = 3;
+const IMG = ["jpg","jpeg","png","gif","webp","avif","svg","bmp","heic","heif","tif","tiff"];
+const AUD = ["mp3","wav","m4a","aac","ogg","oga","flac","opus","aiff","aif","wma"];
 const CATS = {
-  photo:    { label: "Photo",    num: "1", dir: "1-Photo",    kind: "image" },
-  graphi:   { label: "Graphi",   num: "2", dir: "2-Graphi",   kind: "image" },
-  audio:    { label: "Audio",    num: "3", dir: "3-Audio",    kind: "audio" },
-  perso:    { label: "Perso",    num: "4", dir: "4-Perso",    kind: "mixed" },
-  reserves: { label: "Réserves", num: "5", dir: "5-Reserves", kind: "mixed" },
+  photo:    { dir: "1-Photo",    label: "1 · Photo" },
+  graphi:   { dir: "2-Graphi",   label: "2 · Graphi" },
+  audio:    { dir: "3-Audio",    label: "3 · Audio" },
+  perso:    { dir: "4-Perso",    label: "4 · Perso" },
+  reserves: { dir: "5-Reserves", label: "5 · Réserves" },
 };
-const EXT_IMAGE = ["jpg","jpeg","png","gif","webp","avif","svg","bmp"];
-const EXT_AUDIO = ["mp3","wav","m4a","aac","ogg","oga","flac","opus","aiff","aif","wma"];
 
 const $ = (s, r=document) => r.querySelector(s);
 const pad = n => String(n).padStart(2,"0");
+const extOf = n => { const i=n.lastIndexOf("."); return i<0?"":n.slice(i+1).toLowerCase(); };
+const isImg = n => IMG.includes(extOf(n));
+const isAud = n => AUD.includes(extOf(n));
 
-/* ---- Mot de passe horaire (identique à Perso/Réserves) ---- */
-function minuteCode(d){ return pad(d.getDate())+pad(d.getMonth()+1)+d.getFullYear()+pad(d.getHours())+":"+pad(d.getMinutes()); }
-function passOk(raw){
+/* ---- Mot de passe horaire JJMMAAAAHH:MM (identique au site) ---- */
+function minuteCode(d){ return pad(d.getDate())+pad(d.getMonth()+1)+d.getFullYear()+pad(d.getHours())+pad(d.getMinutes()); }
+function passValid(raw){
   const clean = String(raw).replace(/[^0-9]/g,"");
   const now = Date.now();
-  for (let i=-CONFIG.MINUTE_TOLERANCE; i<=CONFIG.MINUTE_TOLERANCE; i++){
-    if (clean === minuteCode(new Date(now+i*60000)).replace(":","")) return true;
+  for (let i=-MINUTE_TOLERANCE; i<=MINUTE_TOLERANCE; i++){
+    if (clean === minuteCode(new Date(now + i*60000))) return true;
   }
   return false;
 }
 
-function extOf(n){ const i=n.lastIndexOf("."); return i<0?"":n.slice(i+1).toLowerCase(); }
-const isImage = n => EXT_IMAGE.includes(extOf(n));
-const isAudio = n => EXT_AUDIO.includes(extOf(n));
-function fits(name, kind){
-  if (kind==="image") return isImage(name);
-  if (kind==="audio") return isAudio(name);
-  return isImage(name) || isAudio(name);
-}
-
-/* ---- Lecture/écriture du fichier legendes.txt ---- */
+/* ---- Lecture / écriture du format legendes.txt ---- */
+// Renvoie { map, header } : map nom→légende, header = commentaires d'origine.
 function parseCaptions(txt){
-  const map = new Map();
-  txt.split(/\r?\n/).forEach(line=>{
+  const map = new Map(); const header = [];
+  let bodyStarted = false;
+  txt.split(/\r?\n/).forEach(line => {
     const row = line.trim();
+    if (!bodyStarted && (row==="" || row.startsWith("#"))) { header.push(line); return; }
     if (!row || row.startsWith("#")) return;
     const cand = [row.indexOf("="), row.indexOf("|")].filter(i=>i>0);
     if (!cand.length) return;
+    bodyStarted = true;
     const sep = Math.min(...cand);
-    const file = row.slice(0,sep).trim().toLowerCase();
-    const text = row.slice(sep+1).trim();
-    if (file) map.set(file, text);
+    map.set(row.slice(0,sep).trim().toLowerCase(), row.slice(sep+1).trim());
   });
-  return map;
+  return { map, header };
 }
-/* Reconstruit le fichier : en-tête + une ligne par média porteur de légende. */
-function buildCaptions(items){
-  const head =
-    "# Légendes — généré par l'outil d'administration.\n" +
-    "# Une ligne par fichier :  nom = légende\n\n";
-  const lines = items
-    .filter(it => it.caption.trim())
-    .map(it => it.name + " = " + it.caption.trim());
-  return head + lines.join("\n") + (lines.length ? "\n" : "");
+function buildCaptions(header, entries){
+  const lines = [];
+  if (header.length) lines.push(header.join("\n").replace(/\n+$/,""), "");
+  entries.forEach(([name, cap]) => { if (cap.trim()) lines.push(name + " = " + cap.trim()); });
+  return lines.join("\n") + "\n";
 }
 
 /* ---- État ---- */
-const supportsFS = typeof window.showDirectoryPicker === "function";
-const state = { root:null, cat:"photo", items:[], urls:[] };
+const state = { root:null, current:"photo", data:{}, urls:[] };
+Object.keys(CATS).forEach(k => state.data[k] = { files:[], caps:new Map(), header:[], dirty:false });
 
-function releaseUrls(){ state.urls.forEach(URL.revokeObjectURL); state.urls = []; }
+/* ---- Dossier mémorisé (partagé avec le site via IndexedDB « vei-store ») ---- */
+function openDB(){
+  return new Promise((res,rej)=>{
+    const q = indexedDB.open("vei-store", 1);
+    q.onupgradeneeded = () => q.result.createObjectStore("kv");
+    q.onsuccess = () => res(q.result);
+    q.onerror = () => rej(q.error);
+  });
+}
+async function idbGet(key){
+  try {
+    const db = await openDB();
+    return await new Promise((res,rej)=>{
+      const t = db.transaction("kv","readonly").objectStore("kv").get(key);
+      t.onsuccess = ()=>res(t.result); t.onerror = ()=>rej(t.error);
+    });
+  } catch { return undefined; }
+}
+async function idbSet(key,val){
+  try {
+    const db = await openDB();
+    await new Promise((res,rej)=>{
+      const tx = db.transaction("kv","readwrite");
+      tx.objectStore("kv").put(val,key);
+      tx.oncomplete = res; tx.onerror = ()=>rej(tx.error);
+    });
+  } catch {}
+}
 
-/* ---- Portail ---- */
-$("#gateForm").addEventListener("submit", e=>{
+// Vérifie qu'un handle pointe bien sur la racine (contient au moins un des dossiers).
+async function estRacine(handle){
+  for (const c of Object.values(CATS)){
+    try { await handle.getDirectoryHandle(c.dir); return true; } catch {}
+  }
+  return false;
+}
+
+// Tente de relier automatiquement le dossier déjà autorisé sur le site.
+async function relierAuto(){
+  if (typeof window.showDirectoryPicker !== "function") return false;
+  const h = await idbGet("rootHandle");
+  if (!h) return false;
+  try {
+    if (await h.queryPermission({ mode:"readwrite" }) !== "granted") return false;
+    if (!(await estRacine(h))) return false;
+    state.root = h;
+    await loadAll();
+    setStatus("Dossier relié automatiquement : " + h.name, "saved");
+    return true;
+  } catch { return false; }
+}
+
+const toast = (m, ms=2400) => {
+  const t=$("#toast"); t.textContent=m; t.hidden=false;
+  clearTimeout(toast._t); toast._t=setTimeout(()=>t.hidden=true, ms);
+};
+function setStatus(txt, cls=""){ const s=$("#status"); s.textContent=txt; s.className="status "+cls; }
+
+/* ---- Connexion ---- */
+$("#gateForm").addEventListener("submit", e => {
   e.preventDefault();
-  if (passOk($("#pass").value)){
-    $("#gate").style.display = "none";
-    $("#app").style.display = "block";
-    if (!supportsFS) $("#fsWarn").style.display = "block";
-    buildTabs();
+  if (passValid($("#pass").value)) {
+    $("#gate").hidden = true; $("#app").hidden = false;
+    if (typeof window.showDirectoryPicker !== "function") {
+      setStatus("Ce navigateur ne peut pas écrire les fichiers — utilisez Chrome.", "dirty");
+      $("#connect").disabled = true;
+    } else {
+      // Si le site a déjà autorisé le dossier, on le relie sans rien demander.
+      relierAuto();
+    }
   } else {
     $("#gateErr").textContent = "Mot de passe incorrect.";
     $("#pass").value = ""; $("#pass").focus();
   }
 });
 
-/* ---- Onglets ---- */
-function buildTabs(){
-  const box = $("#tabs"); box.innerHTML = "";
+/* ---- Relier le dossier + lire les 5 sous-dossiers ---- */
+$("#connect").addEventListener("click", async () => {
+  try {
+    const root = await window.showDirectoryPicker({ mode:"readwrite" });
+    // Vérifie que c'est bien la racine
+    let ok=false;
+    for (const c of Object.values(CATS)) { try { await root.getDirectoryHandle(c.dir); ok=true; break; } catch{} }
+    if (!ok) { toast("Choisissez le dossier « Voyage-en-Imaginaire »."); return; }
+    state.root = root;
+    await idbSet("rootHandle", root);      // mémorisé pour le site et les prochaines fois
+    await loadAll();
+    setStatus("Dossier relié : " + root.name, "saved");
+  } catch(e){ if (e.name!=="AbortError") toast("Liaison annulée."); }
+});
+
+$("#reload").addEventListener("click", async () => {
+  if (!state.root) { toast("Reliez d'abord votre dossier."); return; }
+  if (Object.values(state.data).some(d=>d.dirty) &&
+      !confirm("Des légendes non enregistrées seront perdues. Recharger quand même ?")) return;
+  await loadAll();
+  toast("Rechargé depuis le disque.");
+});
+
+async function loadAll(){
+  for (const key of Object.keys(CATS)){
+    const d = state.data[key];
+    d.files=[]; d.caps=new Map(); d.header=[]; d.dirty=false;
+    try {
+      const dir = await state.root.getDirectoryHandle(CATS[key].dir);
+      for await (const e of dir.values()){
+        if (e.kind!=="file" || e.name.startsWith(".")) continue;
+        if (e.name===CAPTIONS_FILE){
+          const parsed = parseCaptions(await (await e.getFile()).text());
+          d.caps = parsed.map; d.header = parsed.header;
+          continue;
+        }
+        if (isImg(e.name) || isAud(e.name)) d.files.push({ name:e.name, handle:e });
+      }
+      d.files.sort((a,b)=>a.name.localeCompare(b.name,"fr",{numeric:true}));
+    } catch { /* dossier absent : ignoré */ }
+  }
+  renderTabs();
+  render();
+}
+
+function renderTabs(){
+  const t = $("#tabs"); t.innerHTML="";
   Object.entries(CATS).forEach(([key,c])=>{
-    const b = document.createElement("button");
-    b.innerHTML = '<span class="n">'+c.num+'</span> '+c.label;
-    b.className = key===state.cat ? "active" : "";
-    b.onclick = ()=>{ if (confirmLeave()){ state.cat=key; buildTabs(); render(); } };
-    box.appendChild(b);
+    const b=document.createElement("button");
+    b.className = key===state.current ? "on" : "";
+    b.innerHTML = c.label + ' <span class="count">'+state.data[key].files.length+'</span>';
+    b.onclick = ()=>{ state.current=key; renderTabs(); render(); };
+    t.appendChild(b);
   });
 }
 
-/* ---- Liaison dossier ---- */
-$("#connect").addEventListener("click", connect);
-async function connect(){
-  if (!supportsFS){ alert("Ouvrez cette page avec Google Chrome pour relier un dossier."); return; }
-  try {
-    const h = await window.showDirectoryPicker({ id:"vei-root", mode:"readwrite" });
-    // Vérifie qu'il s'agit bien de la racine
-    let ok = false;
-    for (const c of Object.values(CATS)){
-      try { await h.getDirectoryHandle(c.dir); ok = true; break; } catch {}
-    }
-    if (!ok){ setStatus(false, "Ce n'est pas le bon dossier"); return; }
-    state.root = h;
-    setStatus(true, h.name);
-    await render();
-  } catch(e){ if (e.name!=="AbortError") setStatus(false, "Liaison annulée"); }
-}
-function setStatus(on, txt){
-  $("#dot").className = "dot" + (on?" on":"");
-  $("#statusText").textContent = txt;
-}
+function releaseUrls(){ state.urls.forEach(URL.revokeObjectURL); state.urls=[]; }
 
-/* ---- Chargement d'un dossier ---- */
 async function render(){
   releaseUrls();
-  const grid = $("#grid"), empty = $("#empty");
-  grid.innerHTML = ""; empty.style.display = "none";
-  $("#save").disabled = true;
+  const key = state.current, d = state.data[key];
+  const grid=$("#grid"), empty=$("#empty");
+  grid.innerHTML="";
 
-  if (!state.root){
-    empty.style.display = "block";
-    empty.textContent = "Reliez d'abord le dossier Voyage-en-Imaginaire.";
+  const n = d.files.length;
+  const done = d.files.filter(f=>d.caps.get(f.name.toLowerCase())).length;
+  $("#foot").textContent = CATS[key].label + " — " + n + " fichier(s), " + done + " légende(s) posée(s)";
+
+  if (!n){
+    empty.hidden=false;
+    empty.textContent = state.root ? "Aucun fichier dans ce dossier." : "Reliez votre dossier pour voir les fichiers.";
     return;
   }
+  empty.hidden=true;
 
-  const c = CATS[state.cat];
-  let dir;
-  try { dir = await state.root.getDirectoryHandle(c.dir); }
-  catch { empty.style.display="block"; empty.textContent="Dossier "+c.dir+" introuvable."; return; }
+  for (const f of d.files){
+    const card=document.createElement("div"); card.className="card";
+    const thumb=document.createElement("div"); thumb.className="thumb";
 
-  // Légendes existantes
-  let caps = new Map();
-  try {
-    const fh = await dir.getFileHandle(CONFIG.CAPTIONS_FILE);
-    caps = parseCaptions(await (await fh.getFile()).text());
-  } catch {}
-
-  // Fichiers médias
-  const items = [];
-  for await (const e of dir.values()){
-    if (e.kind!=="file" || e.name.startsWith(".")) continue;
-    if (e.name === CONFIG.CAPTIONS_FILE) continue;
-    if (!fits(e.name, c.kind)) continue;
-    items.push({ name:e.name, handle:e, caption: caps.get(e.name.toLowerCase()) || "" });
-  }
-  items.sort((a,b)=>a.name.localeCompare(b.name,"fr",{numeric:true}));
-  state.items = items;
-  state.dir = dir;
-
-  if (!items.length){
-    empty.style.display = "block";
-    empty.textContent = "Aucun fichier dans "+c.dir+".";
-    $("#msg").textContent = "";
-    return;
-  }
-
-  for (const it of items) grid.appendChild(await makeCard(it, c.kind));
-  $("#save").disabled = false;
-  $("#msg").textContent = items.length + " fichier(s). Les modifiés sont marqués d'un point.";
-}
-
-async function makeCard(item, kind){
-  const card = document.createElement("div");
-  card.className = "card";
-
-  const thumb = document.createElement("div");
-  thumb.className = "thumb";
-  if (isImage(item.name)){
-    try {
-      const file = await item.handle.getFile();
-      const url = URL.createObjectURL(file); state.urls.push(url);
-      const img = document.createElement("img"); img.src = url; img.alt = item.name;
-      img.onerror = ()=>{ thumb.innerHTML = '<div class="none">Aperçu impossible<br>('+extOf(item.name).toUpperCase()+')</div>'; };
+    if (isAud(f.name)) { thumb.classList.add("audio"); thumb.innerHTML='<div class="disc"></div>'; }
+    else {
+      const img=document.createElement("img");
+      try { const url=URL.createObjectURL(await f.handle.getFile()); state.urls.push(url); img.src=url; } catch{}
+      img.onerror=()=>{ thumb.textContent="🖼️ aperçu indisponible"; };
       thumb.appendChild(img);
-    } catch { thumb.innerHTML = '<div class="none">Illisible</div>'; }
-  } else if (isAudio(item.name)){
-    thumb.innerHTML = '<div class="audio">🎵</div>';
-  } else {
-    thumb.innerHTML = '<div class="none">—</div>';
-  }
-  card.appendChild(thumb);
+    }
 
-  const body = document.createElement("div");
-  body.className = "card__body";
-  const name = document.createElement("div");
-  name.className = "card__name"; name.textContent = item.name;
-  const cap = document.createElement("input");
-  cap.type = "text"; cap.className = "card__cap";
-  cap.placeholder = "Légende…"; cap.value = item.caption;
-  cap.addEventListener("input", ()=>{
-    item.caption = cap.value;
-    card.classList.toggle("dirty", cap.value !== (item._saved ?? item.caption));
-  });
-  item._saved = item.caption;
-  body.appendChild(name); body.appendChild(cap);
-  card.appendChild(body);
-  return card;
+    const body=document.createElement("div"); body.className="card__body";
+    const name=document.createElement("div"); name.className="card__name"; name.textContent=f.name;
+    const ta=document.createElement("textarea");
+    ta.placeholder="Légende…";
+    ta.value = d.caps.get(f.name.toLowerCase()) || "";
+    ta.addEventListener("input", ()=>{
+      d.caps.set(f.name.toLowerCase(), ta.value);
+      d.dirty=true; card.classList.toggle("changed", !!ta.value.trim());
+      setStatus("Modifications non enregistrées", "dirty");
+    });
+    if (ta.value.trim()) card.classList.add("changed");
+
+    body.append(name, ta);
+    card.append(thumb, body);
+    grid.appendChild(card);
+  }
 }
 
-/* ---- Enregistrement ---- */
-$("#save").addEventListener("click", save);
-async function save(){
-  if (!state.dir) return;
-  $("#save").disabled = true;
-  $("#msg").textContent = "Enregistrement…";
+/* ---- Enregistrer l'onglet courant dans son legendes.txt ---- */
+$("#save").addEventListener("click", async () => {
+  if (!state.root) { toast("Reliez d'abord votre dossier."); return; }
+  const key = state.current, d = state.data[key];
   try {
-    const fh = await state.dir.getFileHandle(CONFIG.CAPTIONS_FILE, { create:true });
+    const dir = await state.root.getDirectoryHandle(CATS[key].dir);
+    // On écrit une entrée pour chaque fichier présent, dans l'ordre.
+    const entries = d.files.map(f => {
+      const cap = d.caps.get(f.name.toLowerCase()) || "";
+      return [f.name, cap];
+    });
+    const header = d.header.length ? d.header : ["# Légendes — une ligne par fichier :  nom = légende"];
+    const txt = buildCaptions(header, entries);
+    const fh = await dir.getFileHandle(CAPTIONS_FILE, { create:true });
     const w = await fh.createWritable();
-    await w.write(buildCaptions(state.items));
-    await w.close();
-    state.items.forEach(it => it._saved = it.caption);
-    document.querySelectorAll(".card").forEach(c=>c.classList.remove("dirty"));
-    const n = state.items.filter(it=>it.caption.trim()).length;
-    $("#msg").textContent = "✓ Enregistré dans "+CATS[state.cat].dir+"/legendes.txt — "+n+" légende(s).";
-  } catch(e){
-    $("#msg").textContent = "Échec : "+(e.message||e.name);
-  }
-  $("#save").disabled = false;
-}
+    await w.write(txt); await w.close();
+    d.dirty=false;
+    setStatus("Enregistré ✓", "saved");
+    toast("Légendes de « "+CATS[key].label+" » enregistrées.");
+    render();
+  } catch(e){ toast("Échec de l'enregistrement : "+e.message); }
+});
 
-$("#reload").addEventListener("click", ()=>{ if (confirmLeave()) render(); });
-
-function confirmLeave(){
-  const dirty = state.items.some(it => it.caption !== (it._saved ?? it.caption));
-  return !dirty || confirm("Des légendes non enregistrées seront perdues. Continuer ?");
-}
-window.addEventListener("beforeunload", e=>{
-  if (state.items.some(it => it.caption !== (it._saved ?? it.caption))){ e.preventDefault(); e.returnValue=""; }
+/* Prévenir avant de quitter si des changements ne sont pas sauvés */
+window.addEventListener("beforeunload", e => {
+  if (Object.values(state.data).some(d=>d.dirty)) { e.preventDefault(); e.returnValue=""; }
 });
 </script>
 </body>

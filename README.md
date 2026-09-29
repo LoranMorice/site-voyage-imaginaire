@@ -195,6 +195,25 @@ L'adresse devient `http://localhost:5500`, que Chrome reconnaît d'une fois à
 l'autre. Avantage supplémentaire : vous voyez alors le site tel que vos
 visiteurs le verront.
 
+### La console des légendes (admin.html)
+
+Outil privé pour poser toutes vos légendes d'un coup, sans éditer les
+`legendes.txt` à la main.
+
+1. Ouvrez **`admin.html`** dans Chrome (double-clic ou Live Server)
+2. Mot de passe : celui des onglets protégés, `JJMMAAAAHH:MM`
+   (date + heure + minute du moment, ex. à 16 h 31 le 29/09/2026 → `290920261631`)
+3. **Relier mon dossier** → choisir `Voyage-en-Imaginaire`
+4. Chaque onglet (les cinq) affiche une **vignette par fichier** avec, en
+   dessous, un **champ encadré** pour la légende
+5. **Enregistrer cet onglet** écrit le `legendes.txt` du dossier concerné
+
+Puis, pour publier ces légendes : `publier.command`, commit, push.
+
+Chrome est nécessaire (écriture directe des fichiers). La page n'est pas
+indexée et aucun lien du site n'y conduit. Elle ne modifie que les
+`legendes.txt`, jamais vos images ni vos sons.
+
 ### L'outil de diagnostic
 
 `diagnostic.html` — à ouvrir dans Chrome en cas de doute. Il indique :

@@ -1137,6 +1137,13 @@ function initApp() {
 
   $("#connectBtn").addEventListener("click", connectFolder);
 
+  // Bouton « Légendes (admin) » : ouvre l'éditeur de légendes dans un
+  // nouvel onglet. L'applet redemande le mot de passe horaire, elle est
+  // donc protégée indépendamment du site.
+  $("#adminBtn")?.addEventListener("click", () => {
+    window.open("admin.html", "_blank", "noopener");
+  });
+
   // Raccourcis clavier globaux
   document.addEventListener("keydown", (e) => {
     if (!$("#lockModal").hidden) {
