@@ -373,7 +373,21 @@ kbd {
       rgba(8, 14, 30, 0.34) 100%);
 }
 
-.home__text { position: relative; text-align: center; padding: 2rem; }
+/* Couche de nuit : superposée au voile, son opacité (--nuit) est réglée
+   par app.js selon l'heure. 0 en plein jour, ~0.66 la nuit. */
+.home::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background: radial-gradient(ellipse at 50% 120%,
+    rgba(6, 10, 24, 0.75) 0%, rgba(4, 6, 18, 0.95) 100%);
+  opacity: var(--nuit, 0);
+  transition: opacity 2s ease;
+}
+
+.home__text { position: relative; z-index: 3; text-align: center; padding: 2rem; }
 
 .home__title {
   font-family: var(--serif);
@@ -409,6 +423,72 @@ kbd {
   font-size: 0.82rem;
   color: #eae6dc;
   text-shadow: 0 2px 10px rgba(0, 0, 0, 0.75);
+}
+
+/* ==========================================================================
+   3 bis. ASTRE ANIMÉ (soleil le jour, lune la nuit)
+   La trajectoire, la couleur et l'heure sont pilotées par app.js.
+   ========================================================================== */
+
+/* Piste invisible : un arc que l'astre parcourt d'est en ouest.
+   --t va de 0 (lever, à gauche) à 1 (coucher, à droite). */
+.sky {
+  position: absolute;
+  left: 6%;
+  right: 6%;
+  bottom: 26%;
+  height: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* Position horizontale : interpolée en JS via --x (0 → 1). */
+.sky__body {
+  position: absolute;
+  left: calc(var(--x, 0.5) * 100%);
+  /* Hauteur : un arc. Au centre (midi) l'astre est haut ; aux extrémités
+     il rase l'horizon. --lift est calculé en JS (0 bas, 1 haut). */
+  bottom: calc(var(--lift, 0.5) * 30vh);
+  transform: translate(-50%, 50%);
+  width: 84px;
+  height: 84px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  /* Couleur de l'astre, changée en JS selon le moment de la journée. */
+  background: var(--astre, radial-gradient(circle at 40% 38%, #fff3cf, #ffcf4d 55%, #ff9e2c));
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.15);
+  transition: bottom 1.2s ease, left 1.2s ease, background 2s ease;
+}
+
+/* Halo lumineux autour de l'astre. */
+.sky__glow {
+  position: absolute;
+  inset: -60%;
+  border-radius: 50%;
+  background: var(--halo, radial-gradient(circle, rgba(255,214,90,0.55) 0%, rgba(255,214,90,0) 68%));
+  transition: background 2s ease;
+}
+
+/* Heure affichée au centre de l'astre. */
+.sky__clock {
+  position: relative;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  font-size: 0.98rem;
+  letter-spacing: 0.02em;
+  color: var(--clock, rgba(60, 40, 10, 0.72));
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.35);
+  transition: color 2s ease;
+}
+
+@media (max-width: 820px) {
+  .sky__body { width: 66px; height: 66px; }
+  .sky__clock { font-size: 0.82rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sky__body { transition: none; }
 }
 
 /* ==========================================================================

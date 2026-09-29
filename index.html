@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Voyage en Imaginaire — Laurent GANNE</title>
-  <meta name="description" content="Voyage en Imaginaire — photographies, graphismes et créations sonores de Laurent GANNE." />
+  <title>Voyage en Imaginaire — LoranG</title>
+  <meta name="description" content="Voyage en Imaginaire — photographies, graphismes et créations sonores de LoranG." />
   <meta name="robots" content="noindex, nofollow" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -22,7 +22,7 @@
   <div class="gate__veil" aria-hidden="true"></div>
 
   <div class="gate__content">
-    <p class="gate__eyebrow">Laurent GANNE présente</p>
+    <p class="gate__eyebrow">LoranG présente</p>
     <h1 class="gate__title">Voyage&nbsp;en<br /><em>Imaginaire</em></h1>
 
     <form class="keyframe" id="gateForm" autocomplete="off">
@@ -55,7 +55,7 @@
         <span class="rail__brand-main">Voyage en</span>
         <span class="rail__brand-sub">Imaginaire</span>
       </a>
-      <p class="rail__author">Laurent GANNE</p>
+      <p class="rail__author">LoranG</p>
     </div>
 
     <nav class="rail__nav">
@@ -105,10 +105,20 @@
       <div class="home">
         <div class="home__wall" id="homeWall" aria-hidden="true"></div>
         <div class="home__veil" aria-hidden="true"></div>
+
+        <!-- Astre : sa position, sa couleur et l'heure affichée sont
+             recalculées chaque minute par app.js (fonction initSky). -->
+        <div class="sky" id="sky" aria-hidden="true">
+          <div class="sky__body" id="skyBody">
+            <span class="sky__glow" id="skyGlow"></span>
+            <span class="sky__clock" id="skyClock">--:--</span>
+          </div>
+        </div>
+
         <div class="home__text">
           <h2 class="home__title">Voyage en Imaginaire</h2>
           <p class="home__sub">Photographies · Graphismes · Créations sonores</p>
-          <p class="home__by">Laurent GANNE</p>
+          <p class="home__by">LoranG</p>
           <p class="home__guide" id="homeGuide">
             Choisissez une porte dans la colonne de gauche.
           </p>

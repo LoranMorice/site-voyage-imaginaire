@@ -1030,10 +1030,103 @@ async function restoreWallpaper() {
 }
 
 /* --------------------------------------------------------------------------
+   10 bis. CIEL VIVANT — trajectoire du soleil, heure, luminosité
+   -------------------------------------------------------------------------- */
+
+/**
+ * Recalcule, à partir de l'heure courante :
+ *   - la position de l'astre sur son arc (est → ouest)
+ *   - sa hauteur (bas au lever/coucher, haut à midi)
+ *   - sa couleur (soleil doré le jour, lune pâle la nuit)
+ *   - l'heure affichée en son centre, au format HH:MM
+ *   - la luminosité générale de la page d'accueil
+ *
+ * Tout se cale sur l'horloge de l'appareil du visiteur.
+ */
+function updateSky() {
+  const now = new Date();
+  const h = now.getHours() + now.getMinutes() / 60;   // heure décimale 0–24
+
+  // ---- Heure affichée dans l'astre ----
+  const clock = pad(now.getHours()) + ":" + pad(now.getMinutes());
+  const clockEl = $("#skyClock");
+  if (clockEl) clockEl.textContent = clock;
+
+  const body = $("#skyBody");
+  const glow = $("#skyGlow");
+  const home = $(".home");
+  if (!body) return;
+
+  // ---- Jour ou nuit ? Lever ~7h, coucher ~19h (repères visuels simples) ----
+  const LEVER = 7, COUCHER = 19;
+  const jour = h >= LEVER && h < COUCHER;
+
+  // t : progression sur l'arc visible (0 au lever/début de nuit, 1 à la fin)
+  let t;
+  if (jour) {
+    t = (h - LEVER) / (COUCHER - LEVER);              // course diurne
+  } else {
+    // Course nocturne : du coucher (19h) au lever (7h), soit 12h à cheval
+    // sur minuit. On ramène ça sur 0→1 pour faire voyager la lune aussi.
+    const nuit = (h < LEVER) ? h + 24 : h;            // 19…31
+    t = (nuit - COUCHER) / ((24 - COUCHER) + LEVER);  // 0→1
+  }
+  t = Math.max(0, Math.min(1, t));
+
+  // Position horizontale (gauche→droite) et hauteur en arc (sin).
+  body.style.setProperty("--x", t.toFixed(4));
+  body.style.setProperty("--lift", Math.sin(t * Math.PI).toFixed(4));
+
+  // ---- Palette selon le moment ----
+  let astre, halo, clockColor, luminosite;
+
+  if (!jour) {
+    // Lune : disque pâle, halo froid, page sombre
+    astre = "radial-gradient(circle at 42% 40%, #f2f4ff, #cdd6f0 60%, #9aa6c8)";
+    halo = "radial-gradient(circle, rgba(180,200,255,0.30) 0%, rgba(180,200,255,0) 70%)";
+    clockColor = "rgba(30, 40, 70, 0.78)";
+    luminosite = 0.34;                                // nuit : bien assombri
+  } else if (h < LEVER + 2 || h > COUCHER - 2) {
+    // Aube / crépuscule : soleil orangé, page tamisée
+    astre = "radial-gradient(circle at 40% 38%, #fff0cf, #ffb057 55%, #ff7e30)";
+    halo = "radial-gradient(circle, rgba(255,150,70,0.50) 0%, rgba(255,150,70,0) 70%)";
+    clockColor = "rgba(70, 35, 5, 0.78)";
+    luminosite = 0.72;
+  } else {
+    // Plein jour : soleil éclatant, page lumineuse
+    astre = "radial-gradient(circle at 40% 38%, #fffce8, #ffd94d 55%, #ff9e2c)";
+    halo = "radial-gradient(circle, rgba(255,220,90,0.55) 0%, rgba(255,220,90,0) 68%)";
+    clockColor = "rgba(60, 40, 10, 0.72)";
+    luminosite = 1;                                   // clair
+  }
+
+  body.style.setProperty("--astre", astre);
+  body.style.setProperty("--clock", clockColor);
+  if (glow) glow.style.setProperty("--halo", halo);
+
+  // La luminosité agit sur le voile : plus il est opaque, plus c'est sombre.
+  // On pilote une variable que le voile de l'accueil peut utiliser.
+  if (home) home.style.setProperty("--nuit", (1 - luminosite).toFixed(3));
+}
+
+/** Lance l'horloge du ciel et la rafraîchit chaque minute. */
+function initSky() {
+  updateSky();
+  // Cadence sur le changement de minute pour rester précis sans surcharger.
+  const now = new Date();
+  const versMinute = (60 - now.getSeconds()) * 1000;
+  setTimeout(() => {
+    updateSky();
+    setInterval(updateSky, 60000);
+  }, versMinute);
+}
+
+/* --------------------------------------------------------------------------
    11. DÉMARRAGE
    -------------------------------------------------------------------------- */
 
 function initApp() {
+  initSky();
   // Menu de gauche
   $("#rail").addEventListener("click", (e) => {
     const btn = e.target.closest("[data-go]");
