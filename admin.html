@@ -78,11 +78,11 @@
     border-radius: 12px; overflow: hidden; display: flex; flex-direction: column;
   }
   .thumb {
-    height: 150px; display: grid; place-items: center;
+    height: 220px; display: grid; place-items: center;
     background: repeating-linear-gradient(45deg, rgba(255,255,255,.02) 0 10px, transparent 10px 20px), #0f1326;
     overflow: hidden;
   }
-  .thumb img { width: 100%; height: 100%; object-fit: cover; }
+  .thumb img { width: 100%; height: 100%; object-fit: contain; padding: 10px; }
   .thumb.audio { font-size: 2.4rem; }
   .thumb .disc {
     width: 78px; height: 78px; border-radius: 50%;
