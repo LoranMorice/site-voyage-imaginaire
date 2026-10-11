@@ -4,6 +4,29 @@ Toutes les modifications notables du site sont consignées ici.
 
 ---
 
+## Version 1.4 — 11 octobre 2026
+
+Affichage des photos corrigé : la photo apparaît désormais **en entier**,
+avec sa légende toujours visible.
+
+### Visionneuse
+
+- La visionneuse utilisait une hauteur maximale au lieu d'une hauteur fixe :
+  une photo haute pouvait grossir et pousser sa légende hors du cadre
+  masqué. `.shot` occupe maintenant toute la hauteur disponible et centre
+  son contenu.
+- L'image passe de `flex: 1 1 auto` à `flex: 0 1 auto` : elle **rétrécit**
+  pour tenir dans l'espace restant, au lieu de déborder.
+
+### Divers
+
+- Les légendes étaient absentes pour certains visiteurs : il s'agissait
+  d'un simple cache navigateur (`cache-control: max-age=600` de GitHub
+  Pages), pas d'une erreur de code ni de données. Un rechargement forcé
+  (`Cmd+Maj+R`) ou une fenêtre privée suffit.
+
+---
+
 ## Version 1.3 — 29 septembre 2026
 
 Console des légendes : un outil d'administration pour renseigner les
