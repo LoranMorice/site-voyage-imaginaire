@@ -4,6 +4,24 @@ Toutes les modifications notables du site sont consignées ici.
 
 ---
 
+## Version 1.5 — 11 octobre 2026
+
+Photos plus petites et présentées en **format carte postale** : la photo
+est encadrée d'un liseré crème (le « carton » de la carte), légèrement
+plus large en bas, avec la légende centrée juste en dessous.
+
+### Visionneuse
+
+- `.shot` est limité à une largeur modérée (`min(560px, 92%)`) au lieu de
+  s'étaler sur toute la visionneuse.
+- `.shot img` est plafonné en hauteur (`max-height: 58vh`) pour que la
+  photo reste toujours **entière** et contenue.
+- Ajout d'un fond crème, d'un padding asymétrique (plus bas) et d'une
+  double ombre portée : l'image ressemble à une vraie carte postale.
+- La légende occupe toute la largeur de la carte, centrée sous la photo.
+
+---
+
 ## Version 1.4 — 11 octobre 2026
 
 Affichage des photos corrigé : la photo apparaît désormais **en entier**,

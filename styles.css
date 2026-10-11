@@ -659,7 +659,7 @@ kbd {
   padding: 1.6rem 3.6rem 3.4rem;
 }
 
-/* ---- Image + sa légende, empilées ---- */
+/* ---- Carte postale : photo encadrée + légende en dessous ---- */
 
 .shot {
   margin: 0;
@@ -667,28 +667,33 @@ kbd {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 0.9rem;
-  width: 100%;
-  height: 100%;
-  min-height: 0;          /* indispensable : autorise l'image à rétrécir */
+  gap: 1.05rem;
+  max-width: min(560px, 92%);  /* taille modérée, façon carte postale */
+  max-height: 100%;
   animation: fade 0.4s ease both;
 }
 
 .shot img {
-  flex: 0 1 auto;         /* rétrécit pour tenir dans l'espace restant, sans s'étirer */
+  flex: 0 1 auto;             /* rétrécit sans s'étirer ni déborder */
   min-width: 0;
   min-height: 0;
   max-width: 100%;
+  max-height: 58vh;           /* la photo reste entière et contenue */
   object-fit: contain;
-  border-radius: 6px;
-  box-shadow: 0 22px 60px rgba(0, 0, 0, 0.6);
+  background: #f6f1e4;        /* le « carton » crème de la carte postale */
+  padding: 11px 11px 34px;    /* bordure blanche, plus large en bas */
+  border: 1px solid rgba(0, 0, 0, 0.22);
+  border-radius: 2px;
+  box-shadow:
+    0 2px 5px rgba(0, 0, 0, 0.35),
+    0 18px 40px rgba(0, 0, 0, 0.5);
 }
 
 .shot__caption {
   flex: none;
-  max-width: 62ch;
+  width: 100%;
   font-family: var(--serif);
-  font-size: 1.06rem;
+  font-size: 1.08rem;
   font-style: italic;
   line-height: 1.45;
   text-align: center;
