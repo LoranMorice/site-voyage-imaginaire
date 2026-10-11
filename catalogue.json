@@ -1,6 +1,6 @@
 {
   "_note": "Fichier généré par publier.command — ne pas modifier à la main.",
-  "genere": "10/10/2026 17:30",
+  "genere": "11/10/2026 16:05",
   "onglets": {
     "photo": [
       {
@@ -14,14 +14,94 @@
         "legende": "la haie musicale"
       },
       {
+        "nom": "IMG_0527.jpeg",
+        "fichier": "medias/photo/IMG_0527.jpeg",
+        "legende": "Tour de contrôle (1)"
+      },
+      {
+        "nom": "IMG_0642.jpeg",
+        "fichier": "medias/photo/IMG_0642.jpeg",
+        "legende": "Tour de contrôle (2)"
+      },
+      {
+        "nom": "IMG_0648.jpeg",
+        "fichier": "medias/photo/IMG_0648.jpeg",
+        "legende": "Après midi de neige"
+      },
+      {
+        "nom": "IMG_0698.jpeg",
+        "fichier": "medias/photo/IMG_0698.jpeg",
+        "legende": "Lever (1)"
+      },
+      {
+        "nom": "IMG_0699.jpeg",
+        "fichier": "medias/photo/IMG_0699.jpeg",
+        "legende": "Lever (2)"
+      },
+      {
+        "nom": "IMG_0700.jpeg",
+        "fichier": "medias/photo/IMG_0700.jpeg",
+        "legende": "Lever (3)"
+      },
+      {
+        "nom": "IMG_0800.jpeg",
+        "fichier": "medias/photo/IMG_0800.jpeg",
+        "legende": "Tour de contrôle sans dessus dessous"
+      },
+      {
+        "nom": "IMG_0991.jpeg",
+        "fichier": "medias/photo/IMG_0991.jpeg",
+        "legende": "Je sème à tous vent..."
+      },
+      {
+        "nom": "IMG_1207.jpeg",
+        "fichier": "medias/photo/IMG_1207.jpeg",
+        "legende": "Rub en ciel (1)"
+      },
+      {
+        "nom": "IMG_1209.jpeg",
+        "fichier": "medias/photo/IMG_1209.jpeg",
+        "legende": "Rub en ciel (2)"
+      },
+      {
+        "nom": "IMG_1210.jpeg",
+        "fichier": "medias/photo/IMG_1210.jpeg",
+        "legende": "Rub en ciel (3)"
+      },
+      {
+        "nom": "IMG_1211.jpeg",
+        "fichier": "medias/photo/IMG_1211.jpeg",
+        "legende": "Rub en ciel (4)"
+      },
+      {
+        "nom": "IMG_1284.jpeg",
+        "fichier": "medias/photo/IMG_1284.jpeg",
+        "legende": "les guetteurs (1)"
+      },
+      {
+        "nom": "IMG_1434.jpeg",
+        "fichier": "medias/photo/IMG_1434.jpeg",
+        "legende": "les guetteurs (2)"
+      },
+      {
         "nom": "IMG_1827.jpg",
         "fichier": "medias/photo/IMG_1827.jpg",
         "legende": "Pousse toi de là..."
       },
       {
+        "nom": "IMG_1839.jpeg",
+        "fichier": "medias/photo/IMG_1839.jpeg",
+        "legende": "soleil Rouge (2)"
+      },
+      {
         "nom": "IMG_1839.jpg",
         "fichier": "medias/photo/IMG_1839.jpg",
-        "legende": "Soleil Rouge"
+        "legende": "Soleil Rouge (1)"
+      },
+      {
+        "nom": "IMG_5452.jpeg",
+        "fichier": "medias/photo/IMG_5452.jpeg",
+        "legende": "le mur"
       },
       {
         "nom": "la passante.jpg",
@@ -144,6 +224,26 @@
         "nom": "IMG_1718.jpg",
         "fichier": "medias/graphi/IMG_1718.jpg",
         "legende": "Série fenêtre vue sur mer (19) Refermer la fenêtre"
+      },
+      {
+        "nom": "img20261007_17005496.jpg",
+        "fichier": "medias/graphi/img20261007_17005496.jpg",
+        "legende": "paysage (1)"
+      },
+      {
+        "nom": "img20261007_17014782.jpg",
+        "fichier": "medias/graphi/img20261007_17014782.jpg",
+        "legende": "Dune (1)"
+      },
+      {
+        "nom": "img20261007_17030663.jpg",
+        "fichier": "medias/graphi/img20261007_17030663.jpg",
+        "legende": "Dune (2)"
+      },
+      {
+        "nom": "img20261007_17035606.jpg",
+        "fichier": "medias/graphi/img20261007_17035606.jpg",
+        "legende": "Coucher sur la mer"
       }
     ],
     "audio": [
