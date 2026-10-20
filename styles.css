@@ -632,6 +632,61 @@ kbd {
 
 .export__menu button:hover { background: var(--gold-soft); color: var(--text); }
 
+/* ---- Sous-onglets (Atelier ▸ Réserves) ---- */
+
+.subnav {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  padding: 0.5rem 0 0.9rem;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 1.2rem;
+}
+
+.subnav__tab {
+  padding: 0.4rem 0.85rem;
+  font-size: 0.84rem;
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--muted);
+  cursor: pointer;
+  transition: border-color 0.16s, color 0.16s, background 0.16s;
+}
+
+.subnav__tab:hover,
+.subnav__tab.is-active { border-color: var(--gold-soft); color: var(--text); background: var(--gold-soft); }
+
+/* ---- Carte document (Ecrit / Contribution) ---- */
+
+.doc-card {
+  display: grid;
+  gap: 0.7rem;
+  justify-items: center;
+  text-align: center;
+  padding: 2rem;
+  max-width: 460px;
+}
+
+.doc-card__title {
+  margin: 0;
+  font-family: var(--serif);
+  font-size: 1.35rem;
+  color: var(--text);
+}
+
+.doc-card__link {
+  display: inline-block;
+  padding: 0.6rem 1.2rem;
+  border: 1px solid var(--gold-soft);
+  border-radius: 999px;
+  color: var(--gold);
+  text-decoration: none;
+  transition: background 0.16s, color 0.16s;
+}
+
+.doc-card__link:hover { background: var(--gold-soft); color: var(--text); }
+
 /* ==========================================================================
    5. VISIONNEUSE
    ========================================================================== */

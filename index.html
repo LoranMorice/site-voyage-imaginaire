@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Voyage en Imaginaire — LoranG</title>
-  <meta name="description" content="Voyage en Imaginaire — photographies, graphismes et créations sonores de LoranG." />
+  <meta name="description" content="Voyage en Imaginaire — photographies, graphismes, créations sonores, écrits et contributions de LoranG." />
   <meta name="robots" content="noindex, nofollow" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -80,15 +80,18 @@
         <span class="tab__num">3</span><span class="tab__label">Audio</span>
         <span class="tab__count" data-count="audio"></span>
       </button>
-      <button class="tab tab--locked" data-go="perso">
-        <span class="tab__num">4</span><span class="tab__label">Perso</span>
-        <span class="tab__lock" aria-label="protégé">🔒</span>
-        <span class="tab__count" data-count="perso"></span>
+      <button class="tab" data-go="ecrit">
+        <span class="tab__num">4</span><span class="tab__label">Ecrit</span>
+        <span class="tab__count" data-count="ecrit"></span>
       </button>
-      <button class="tab tab--locked" data-go="reserves">
-        <span class="tab__num">5</span><span class="tab__label">Réserves</span>
+      <button class="tab" data-go="contribution">
+        <span class="tab__num">5</span><span class="tab__label">Contribution</span>
+        <span class="tab__count" data-count="contribution"></span>
+      </button>
+      <button class="tab tab--locked" data-go="atelier">
+        <span class="tab__num">6</span><span class="tab__label">Atelier</span>
         <span class="tab__lock" aria-label="protégé">🔒</span>
-        <span class="tab__count" data-count="reserves"></span>
+        <span class="tab__count" data-count="atelier"></span>
       </button>
     </nav>
 
@@ -106,7 +109,7 @@
       </button>
 
       <p class="rail__tip">Flèches <kbd>←</kbd> <kbd>→</kbd> pour défiler</p>
-      <p class="rail__version">Version 1.5 — 11.10.2026</p>
+      <p class="rail__version">Version 1.6 — 20.10.2026</p>
     </div>
   </aside>
 
@@ -130,7 +133,7 @@
 
         <div class="home__text">
           <h2 class="home__title">Voyage en Imaginaire</h2>
-          <p class="home__sub">Photographies · Graphismes · Créations sonores</p>
+          <p class="home__sub">Photographies · Graphismes · Créations sonores · Écrits · Contributions</p>
           <p class="home__by">LoranG</p>
           <p class="home__guide" id="homeGuide">
             Choisissez une porte dans la colonne de gauche.
@@ -142,19 +145,21 @@
       </div>
     </section>
 
-    <!-- ===== LES 5 ONGLETS (générés sur le même gabarit) ===== -->
-    <section class="view" id="view-photo"    data-cat="photo"></section>
-    <section class="view" id="view-graphi"   data-cat="graphi"></section>
-    <section class="view" id="view-audio"    data-cat="audio"></section>
-    <section class="view" id="view-perso"    data-cat="perso"></section>
-    <section class="view" id="view-reserves" data-cat="reserves"></section>
+    <!-- ===== LES ONGLETS (générés sur le même gabarit) ===== -->
+    <section class="view" id="view-photo"        data-cat="photo"></section>
+    <section class="view" id="view-graphi"       data-cat="graphi"></section>
+    <section class="view" id="view-audio"        data-cat="audio"></section>
+    <section class="view" id="view-ecrit"        data-cat="ecrit"></section>
+    <section class="view" id="view-contribution" data-cat="contribution"></section>
+    <section class="view" id="view-atelier"      data-cat="atelier"></section>
+    <section class="view" id="view-reserves"     data-cat="reserves"></section>
 
   </main>
 </div>
 
 
 <!-- ================================================================== -->
-<!--  MODALE : mot de passe horaire (Perso / Réserves)                   -->
+<!--  MODALE : mot de passe (Atelier)                                   -->
 <!-- ================================================================== -->
 <div class="modal" id="lockModal" hidden>
   <div class="modal__box" role="dialog" aria-modal="true" aria-labelledby="lockTitle">
@@ -194,12 +199,8 @@
       </button>
       <button class="chip" data-act="wall" title="Utiliser comme papier peint">Papier peint</button>
       <div class="export" data-export hidden>
-        <button class="chip chip--export" data-act="export-open">Exporter vers ▾</button>
-        <div class="export__menu">
-          <button data-export-to="photo">1 · Photo</button>
-          <button data-export-to="graphi">2 · Graphi</button>
-          <button data-export-to="audio">3 · Audio</button>
-        </div>
+        <button class="chip chip--export" data-act="export-open">Envoyer vers ▾</button>
+        <div class="export__menu"></div>
       </div>
     </div>
   </header>

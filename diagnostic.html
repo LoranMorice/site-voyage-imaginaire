@@ -48,14 +48,17 @@
 
 <script>
 const CATS = {
-  photo:    { dir: "1-Photo",    kind: "image" },
-  graphi:   { dir: "2-Graphi",   kind: "image" },
-  audio:    { dir: "3-Audio",    kind: "audio" },
-  perso:    { dir: "4-Perso",    kind: "mixed" },
-  reserves: { dir: "5-Reserves", kind: "mixed" },
+  photo:        { dir: "1-Photo",        kind: "image" },
+  graphi:       { dir: "2-Graphi",       kind: "image" },
+  audio:        { dir: "3-Audio",        kind: "audio" },
+  ecrit:        { dir: "4-Ecrit",        kind: "doc" },
+  contribution: { dir: "5-Contribution", kind: "mixed" },
+  atelier:      { dir: "6-Atelier",      kind: "mixed" },
+  reserves:     { dir: "7-Reserves",     kind: "mixed" },
 };
 const EXT_IMAGE = ["jpg","jpeg","png","gif","webp","avif","svg","bmp","heic","heif","tif","tiff"];
 const EXT_AUDIO = ["mp3","wav","m4a","aac","ogg","oga","flac","opus","aiff","aif","wma"];
+const EXT_DOC   = ["pdf","txt","md","doc","docx","odt","rtf","epub","pages"];
 
 const out = document.getElementById("out");
 let lines = [];
@@ -66,7 +69,8 @@ function fits(name, kind) {
   const e = extOf(name);
   if (kind === "image") return EXT_IMAGE.includes(e);
   if (kind === "audio") return EXT_AUDIO.includes(e);
-  return EXT_IMAGE.includes(e) || EXT_AUDIO.includes(e);
+  if (kind === "doc")   return EXT_DOC.includes(e) || EXT_IMAGE.includes(e);
+  return EXT_IMAGE.includes(e) || EXT_AUDIO.includes(e) || EXT_DOC.includes(e);
 }
 
 async function contexte() {

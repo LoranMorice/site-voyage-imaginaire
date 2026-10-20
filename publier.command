@@ -2,11 +2,11 @@
 # =============================================================================
 #  VOYAGE EN IMAGINAIRE — préparation de la version publique
 #
-#  Double-cliquez sur ce fichier. Il lit vos trois dossiers publics sur le
+#  Double-cliquez sur ce fichier. Il lit vos cinq dossiers publics sur le
 #  Bureau, en fabrique des copies allégées pour le web dans « medias/ »,
 #  puis écrit « catalogue.json », que le site en ligne lit au démarrage.
 #
-#  Les dossiers 4-Perso et 5-Reserves ne sont JAMAIS lus par ce script.
+#  Les dossiers 6-Atelier et 7-Reserves ne sont JAMAIS lus par ce script.
 # =============================================================================
 
 cd "$(dirname "$0")" || exit 1
@@ -42,14 +42,14 @@ echo "   VOYAGE EN IMAGINAIRE — préparation de la publication"
 echo "═══════════════════════════════════════════════════════════"
 echo
 echo "   Source  : $SRC"
-echo "   Publie  : 1-Photo · 2-Graphi · 3-Audio"
-echo "   Ignore  : 4-Perso · 5-Reserves   (restent privés)"
+echo "   Publie  : 1-Photo · 2-Graphi · 3-Audio · 4-Ecrit · 5-Contribution"
+echo "   Ignore  : 6-Atelier · 7-Reserves   (restent privés)"
 echo
 
 # --- Remise à zéro -----------------------------------------------------------
 
 rm -rf "$DEST"
-mkdir -p "$DEST/photo" "$DEST/graphi" "$DEST/audio"
+mkdir -p "$DEST/photo" "$DEST/graphi" "$DEST/audio" "$DEST/ecrit" "$DEST/contribution"
 
 # --- Outils ------------------------------------------------------------------
 
@@ -91,7 +91,7 @@ CONVERTIS=0
 ENTREES=""
 
 # --- Traitement d'une catégorie ---------------------------------------------
-# Usage : traiter <dossier_source> <sous_dossier_dest> <image|audio>
+# Usage : traiter <dossier_source> <sous_dossier_dest> <image|audio|doc|mixed>
 
 traiter() {
   local dossier="$SRC/$1" sortie="$DEST/$2" categorie="$2" type="$3"
@@ -118,7 +118,24 @@ traiter() {
     extlow="$(printf '%s' "$ext" | tr '[:upper:]' '[:lower:]')"
     cible=""
 
-    if [ "$type" = "image" ]; then
+    # Nature réelle du fichier, déduite de son extension.
+    nature=""
+    case "$extlow" in
+      jpg|jpeg|png|gif|webp|svg|avif|bmp|heic|heif|tif|tiff) nature=image ;;
+      mp3|m4a|wav|aac|ogg|oga|flac|opus) nature=audio ;;
+      pdf|txt|md|doc|docx|odt|rtf|epub|pages) nature=doc ;;
+    esac
+
+    # La catégorie restreint la nature acceptée (« mixed » accepte tout).
+    case "$type" in
+      image) [ "$nature" = image ] || { echo "  – $base — format ignoré"; continue; } ;;
+      audio) [ "$nature" = audio ] || { echo "  – $base — format audio ignoré"; continue; } ;;
+      doc)   [ "$nature" = doc ]   || { echo "  – $base — format texte ignoré"; continue; } ;;
+      mixed) [ -n "$nature" ]      || { echo "  – $base — format ignoré"; continue; } ;;
+    esac
+
+    case "$nature" in
+      image)
       case "$extlow" in
         heic|heif|tif|tiff)
           # Formats que Chrome ne sait pas afficher : conversion en JPEG
@@ -172,19 +189,18 @@ traiter() {
           continue
           ;;
       esac
-    else
-      case "$extlow" in
-        mp3|m4a|wav|aac|ogg|oga|flac|opus)
-          cible="$base"
-          cp "$entree" "$sortie/$cible" 2>/dev/null || continue
-          echo "  ♪ $base"
-          ;;
-        *)
-          echo "  – $base — format audio ignoré"
-          continue
-          ;;
-      esac
-    fi
+      ;;
+      audio)
+        cible="$base"
+        cp "$entree" "$sortie/$cible" 2>/dev/null || continue
+        echo "  ♪ $base"
+        ;;
+      doc)
+        cible="$base"
+        cp "$entree" "$sortie/$cible" 2>/dev/null || continue
+        echo "  📄 $base"
+        ;;
+    esac
 
     legende="$(lire_legende "$dossier" "$base")"
 
@@ -201,9 +217,11 @@ traiter() {
   echo "  → $n fichier(s) publié(s)"
 }
 
-traiter "1-Photo"  "photo"  "image"; LISTE_PHOTO="$ENTREES"
-traiter "2-Graphi" "graphi" "image"; LISTE_GRAPHI="$ENTREES"
-traiter "3-Audio"  "audio"  "audio"; LISTE_AUDIO="$ENTREES"
+traiter "1-Photo"        "photo"        "image"; LISTE_PHOTO="$ENTREES"
+traiter "2-Graphi"       "graphi"       "image"; LISTE_GRAPHI="$ENTREES"
+traiter "3-Audio"        "audio"        "audio"; LISTE_AUDIO="$ENTREES"
+traiter "4-Ecrit"        "ecrit"        "doc";   LISTE_ECRIT="$ENTREES"
+traiter "5-Contribution" "contribution" "mixed"; LISTE_CONTRIB="$ENTREES"
 
 # --- Écriture du catalogue ---------------------------------------------------
 
@@ -224,6 +242,12 @@ sans_virgule_finale() {
   echo "    ],"
   echo "    \"audio\": ["
   sans_virgule_finale "$LISTE_AUDIO"
+  echo "    ],"
+  echo "    \"ecrit\": ["
+  sans_virgule_finale "$LISTE_ECRIT"
+  echo "    ],"
+  echo "    \"contribution\": ["
+  sans_virgule_finale "$LISTE_CONTRIB"
   echo "    ]"
   echo "  }"
   echo "}"
@@ -232,7 +256,7 @@ sans_virgule_finale() {
 # --- Contrôle de sécurité ----------------------------------------------------
 
 FUITE=0
-for interdit in "4-Perso" "5-Reserves"; do
+for interdit in "6-Atelier" "7-Reserves"; do
   [ -d "$SRC/$interdit" ] || continue
   for f in "$SRC/$interdit"/*; do
     [ -f "$f" ] || continue

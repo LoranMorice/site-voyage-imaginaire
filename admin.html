@@ -84,6 +84,7 @@
   }
   .thumb img { width: 100%; height: 100%; object-fit: contain; padding: 10px; }
   .thumb.audio { font-size: 2.4rem; }
+  .thumb.doc { font-size: 2.4rem; }
   .thumb .disc {
     width: 78px; height: 78px; border-radius: 50%;
     background: radial-gradient(circle, #0f1326 0 18%, transparent 18.5%),
@@ -172,12 +173,15 @@ const CAPTIONS_FILE = "legendes.txt";
 const MINUTE_TOLERANCE = 3;
 const IMG = ["jpg","jpeg","png","gif","webp","avif","svg","bmp","heic","heif","tif","tiff"];
 const AUD = ["mp3","wav","m4a","aac","ogg","oga","flac","opus","aiff","aif","wma"];
+const DOC = ["pdf","txt","md","doc","docx","odt","rtf","epub","pages"];
 const CATS = {
-  photo:    { dir: "1-Photo",    label: "1 · Photo" },
-  graphi:   { dir: "2-Graphi",   label: "2 · Graphi" },
-  audio:    { dir: "3-Audio",    label: "3 · Audio" },
-  perso:    { dir: "4-Perso",    label: "4 · Perso" },
-  reserves: { dir: "5-Reserves", label: "5 · Réserves" },
+  photo:        { dir: "1-Photo",        label: "1 · Photo" },
+  graphi:       { dir: "2-Graphi",       label: "2 · Graphi" },
+  audio:        { dir: "3-Audio",        label: "3 · Audio" },
+  ecrit:        { dir: "4-Ecrit",        label: "4 · Ecrit" },
+  contribution: { dir: "5-Contribution", label: "5 · Contribution" },
+  atelier:      { dir: "6-Atelier",      label: "6 · Atelier" },
+  reserves:     { dir: "7-Reserves",     label: "7 · Réserves" },
 };
 
 const $ = (s, r=document) => r.querySelector(s);
@@ -185,6 +189,7 @@ const pad = n => String(n).padStart(2,"0");
 const extOf = n => { const i=n.lastIndexOf("."); return i<0?"":n.slice(i+1).toLowerCase(); };
 const isImg = n => IMG.includes(extOf(n));
 const isAud = n => AUD.includes(extOf(n));
+const isDoc = n => DOC.includes(extOf(n));
 
 /* ---- Mot de passe horaire JJMMAAAAHH:MM (identique au site) ---- */
 function minuteCode(d){ return pad(d.getDate())+pad(d.getMonth()+1)+d.getFullYear()+pad(d.getHours())+pad(d.getMinutes()); }
@@ -301,7 +306,7 @@ $("#gateForm").addEventListener("submit", e => {
   }
 });
 
-/* ---- Relier le dossier + lire les 5 sous-dossiers ---- */
+/* ---- Relier le dossier + lire les 7 sous-dossiers ---- */
 $("#connect").addEventListener("click", async () => {
   try {
     const root = await window.showDirectoryPicker({ mode:"readwrite" });
@@ -337,7 +342,7 @@ async function loadAll(){
           d.caps = parsed.map; d.header = parsed.header;
           continue;
         }
-        if (isImg(e.name) || isAud(e.name)) d.files.push({ name:e.name, handle:e });
+        if (isImg(e.name) || isAud(e.name) || isDoc(e.name)) d.files.push({ name:e.name, handle:e });
       }
       d.files.sort((a,b)=>a.name.localeCompare(b.name,"fr",{numeric:true}));
     } catch { /* dossier absent : ignoré */ }
@@ -381,6 +386,7 @@ async function render(){
     const thumb=document.createElement("div"); thumb.className="thumb";
 
     if (isAud(f.name)) { thumb.classList.add("audio"); thumb.innerHTML='<div class="disc"></div>'; }
+    else if (isDoc(f.name)) { thumb.classList.add("doc"); thumb.textContent="📄"; }
     else {
       const img=document.createElement("img");
       try { const url=URL.createObjectURL(await f.handle.getFile()); state.urls.push(url); img.src=url; } catch{}

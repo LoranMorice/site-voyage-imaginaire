@@ -4,6 +4,43 @@ Toutes les modifications notables du site sont consignées ici.
 
 ---
 
+## Version 1.6 — 20 octobre 2026
+
+Nouvelle organisation en **sept onglets**. « Perso » devient « Ecrit » et
+« Contribution », et l'**Atelier** (protégé) accueille le sous-onglet
+« Réserves » d'où l'on peut envoyer les fichiers vers Photo, Graphi,
+Audio ou Ecrit.
+
+### Onglets
+
+- **1 · Photo**, **2 · Graphi**, **3 · Audio** : inchangés.
+- **4 · Ecrit** (remplace « Perso ») : textes, PDF et scans.
+- **5 · Contribution** : nouveau, contenu mixte.
+- **6 · Atelier** : protégé par mot de passe, contient le sous-onglet **7 · Réserves**.
+- **7 · Réserves** : devient un sous-onglet de l'Atelier ; permet d'envoyer
+  un fichier vers Photo, Graphi, Audio ou Ecrit.
+
+### Protection
+
+- L'Atelier (et son sous-onglet Réserves) est protégé par le **mot de passe
+  JJMMAAAAHHMM** (jour, mois, année, heure, minute) au lieu du simple mot de
+  passe horaire.
+- Photo, Graphi, Audio, Ecrit et Contribution restent publics.
+
+### Publication
+
+- `publier.command` publie désormais **cinq** dossiers publics
+  (1-Photo, 2-Graphi, 3-Audio, 4-Ecrit, 5-Contribution).
+- Les dossiers 6-Atelier et 7-Reserves ne sont **jamais** exportés :
+  ils restent privés.
+
+### Affichage des documents
+
+- Les fichiers Ecrit (PDF, texte, Word…) affichent une carte avec un lien
+  « Ouvrir / télécharger » au lieu d'un aperçu vide.
+
+---
+
 ## Version 1.5 — 11 octobre 2026
 
 Photos plus petites et présentées en **format carte postale** : la photo

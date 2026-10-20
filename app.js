@@ -16,7 +16,7 @@ const CONFIG = {
 
   /**
    * Tolérance, en minutes, pour le mot de passe horaire des onglets
-   * Perso et Réserves. 3 signifie : les 3 minutes avant et après sont
+   * Atelier et Réserves. 3 signifie : les 3 minutes avant et après sont
    * acceptées, sinon il serait quasi impossible de le saisir à temps.
    */
   MINUTE_TOLERANCE: 3,
@@ -28,17 +28,20 @@ const CONFIG = {
   CAPTIONS_FILE: "legendes.txt",
 };
 
-/** Les cinq onglets, dans l'ordre du menu. */
+/** Les sept onglets, dans l'ordre du menu. */
 const CATS = {
-  photo:    { label: "Photo",    num: "1", dir: "1-Photo",    kind: "image", locked: false },
-  graphi:   { label: "Graphi",   num: "2", dir: "2-Graphi",   kind: "image", locked: false },
-  audio:    { label: "Audio",    num: "3", dir: "3-Audio",    kind: "audio", locked: false },
-  perso:    { label: "Perso",    num: "4", dir: "4-Perso",    kind: "mixed", locked: true  },
-  reserves: { label: "Réserves", num: "5", dir: "5-Reserves", kind: "mixed", locked: true  },
+  photo:        { label: "Photo",        num: "1", dir: "1-Photo",        kind: "image", locked: false },
+  graphi:       { label: "Graphi",       num: "2", dir: "2-Graphi",       kind: "image", locked: false },
+  audio:        { label: "Audio",        num: "3", dir: "3-Audio",        kind: "audio", locked: false },
+  ecrit:        { label: "Ecrit",        num: "4", dir: "4-Ecrit",        kind: "doc",   locked: false },
+  contribution: { label: "Contribution", num: "5", dir: "5-Contribution", kind: "mixed", locked: false },
+  atelier:      { label: "Atelier",      num: "6", dir: "6-Atelier",      kind: "mixed", locked: true,  admin: true, subs: ["reserves"] },
+  reserves:     { label: "Réserves",     num: "7", dir: "7-Reserves",     kind: "mixed", locked: true,  parent: "atelier", exportTo: ["photo", "graphi", "audio", "ecrit"] },
 };
 
 const EXT_IMAGE = ["jpg", "jpeg", "png", "gif", "webp", "avif", "svg", "bmp", "heic", "heif", "tif", "tiff"];
 const EXT_AUDIO = ["mp3", "wav", "m4a", "aac", "ogg", "oga", "flac", "opus", "aiff", "aif", "wma"];
+const EXT_DOC   = ["pdf", "txt", "md", "doc", "docx", "odt", "rtf", "epub", "pages"];
 
 /** Un fichier a-t-il sa place dans cet onglet ? */
 function fitsCat(name, cat) {
@@ -46,7 +49,8 @@ function fitsCat(name, cat) {
   const kind = CATS[cat].kind;
   if (kind === "image") return isImage(name);
   if (kind === "audio") return isAudio(name);
-  return isImage(name) || isAudio(name);                // Perso et Réserves
+  if (kind === "doc")   return isDoc(name) || isImage(name);   // Ecrit : textes + scans
+  return isImage(name) || isAudio(name) || isDoc(name);          // Contribution, Atelier, Réserves
 }
 
 /* --------------------------------------------------------------------------
@@ -92,6 +96,7 @@ function extOf(name) {
 
 const isImage = (name) => EXT_IMAGE.includes(extOf(name));
 const isAudio = (name) => EXT_AUDIO.includes(extOf(name));
+const isDoc   = (name) => EXT_DOC.includes(extOf(name));
 
 function shake(el) {
   el.classList.remove("shake");
@@ -467,7 +472,7 @@ function applyModeUI() {
   // quand le dossier du Bureau est relié en lecture-écriture.
   $$("[data-export]").forEach((el) => {
     const cat = el.closest(".view")?.dataset.cat;
-    el.hidden = !(state.mode === "fs" && cat && CATS[cat].locked);
+    el.hidden = !(state.mode === "fs" && cat && CATS[cat].exportTo);
   });
 }
 
@@ -734,9 +739,12 @@ function refreshCounts() {
    -------------------------------------------------------------------------- */
 
 function go(target) {
-  // Onglet protégé encore verrouillé → on demande le mot de passe horaire.
-  if (CATS[target] && CATS[target].locked && !state.opened.has(target)) {
-    askMinutePassword(target);
+  // Un sous-onglet (Réserves) hérite de la protection de son parent (Atelier).
+  const gate = CATS[target] && CATS[target].parent ? CATS[target].parent : target;
+
+  // Onglet protégé encore verrouillé → on demande le mot de passe (JJMMAAAAHHMM).
+  if (CATS[gate] && CATS[gate].locked && !state.opened.has(gate)) {
+    askMinutePassword(gate);
     return;
   }
 
@@ -821,8 +829,35 @@ function buildView(cat) {
 
   $(".view__title", view).textContent = CATS[cat].num + " · " + CATS[cat].label;
 
-  // Le menu « Exporter vers » n'existe que dans Perso et Réserves.
-  if (CATS[cat].locked) $("[data-export]", view).hidden = false;
+  // Le menu « Envoyer vers » n'existe que dans Réserves : on y trie les
+  // fichiers et on les expédie vers Photo / Graphi / Audio / Ecrit.
+  if (CATS[cat].exportTo) {
+    const menu = $(".export__menu", view);
+    menu.innerHTML = "";
+    CATS[cat].exportTo.forEach((key) => {
+      const b = document.createElement("button");
+      b.dataset.exportTo = key;
+      b.textContent = CATS[key].num + " · " + CATS[key].label;
+      menu.appendChild(b);
+    });
+    $(".chip--export", view).textContent = "Envoyer vers ▾";
+    $("[data-export]", view).hidden = (state.mode !== "fs");
+  }
+
+  // Sous-onglets : l'Atelier contient Réserves, affiché juste sous l'en-tête.
+  if (CATS[cat].subs) {
+    const nav = document.createElement("div");
+    nav.className = "subnav";
+    CATS[cat].subs.forEach((key) => {
+      const b = document.createElement("button");
+      b.className = "subnav__tab";
+      b.type = "button";
+      b.dataset.go = key;
+      b.textContent = CATS[key].num + " · " + CATS[key].label;
+      nav.appendChild(b);
+    });
+    $(".view__head", view).after(nav);
+  }
 
   // ---- Interactions de l'onglet ----
   view.addEventListener("click", async (e) => {
@@ -963,6 +998,23 @@ async function renderView(cat) {
 
       media.appendChild(card);
 
+    } else if (isDoc(item.name)) {
+      // Document (PDF, texte, Word…) : aucun aperçu, on propose un lien.
+      const card = document.createElement("div");
+      card.className = "doc-card";
+      const title = document.createElement("h3");
+      title.className = "doc-card__title";
+      title.textContent = captionOf(item);
+      const link = document.createElement("a");
+      link.className = "doc-card__link";
+      link.href = url;
+      link.download = item.name;
+      link.target = "_blank";
+      link.rel = "noopener";
+      link.textContent = "Ouvrir / télécharger";
+      card.append(title, link);
+      media.appendChild(card);
+
     } else {
       const box = document.createElement("div");
       box.className = "viewer__empty";
@@ -988,7 +1040,7 @@ function step(cat, delta) {
 }
 
 /* --------------------------------------------------------------------------
-   9. EXPORT : Perso / Réserves  →  Photo / Graphi / Audio
+   9. ENVOI : Réserves  →  Photo / Graphi / Audio / Ecrit
    -------------------------------------------------------------------------- */
 
 async function exportCurrent(fromCat, toCat) {
@@ -1002,13 +1054,9 @@ async function exportCurrent(fromCat, toCat) {
     return;
   }
 
-  // Cohérence : une image ne va pas dans Audio, et inversement.
-  if (toCat === "audio" && !isAudio(item.name)) {
-    toast("Ce fichier n'est pas un audio.");
-    return;
-  }
-  if (toCat !== "audio" && !isImage(item.name)) {
-    toast("Ce fichier n'est pas une image.");
+  // Cohérence : le fichier doit avoir sa place dans la catégorie de destination.
+  if (!fitsCat(item.name, toCat)) {
+    toast("Ce fichier n'a pas sa place dans « " + CATS[toCat].label + " ».");
     return;
   }
 
