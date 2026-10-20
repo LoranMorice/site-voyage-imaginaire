@@ -240,12 +240,86 @@ function enterSite() {
   gate.style.transition = "opacity .6s ease";
   gate.style.opacity = "0";
 
+  // Compteur de visites : on ne compte qu'une fois le portail franchi,
+  // puis on affiche le total sur la page d'accueil.
+  countVisit();
+  displayCounter();
+
   setTimeout(() => {
     gate.remove();
     document.documentElement.removeAttribute("data-locked");
     $("#app").hidden = false;
     initApp();
   }, 600);
+}
+
+/* Compte une visite (une seule fois, après le mot de passe).
+   Le script GoatCounter est chargé avec no_onload:true, donc rien n'est
+   compté tant que cette fonction n'est pas appelée. Comme count.js est
+   chargé en async, on attend qu'il soit prêt au lieu de retourner
+   silencieusement si window.goatcounter n'existe pas encore. */
+function countVisit() {
+  // Déduplication : une seule visite par session navigateur.
+  try {
+    if (sessionStorage.getItem("vei-counted")) return;
+  } catch (e) { /* sessionStorage indisponible : on compte quand même */ }
+
+  const send = () => {
+    if (!window.goatcounter || typeof window.goatcounter.count !== "function") return;
+    try {
+      window.goatcounter.count();
+      try { sessionStorage.setItem("vei-counted", "1"); } catch (e) { /* silencieux */ }
+    } catch (e) { /* silencieux */ }
+  };
+
+  if (window.goatcounter && typeof window.goatcounter.count === "function") {
+    send();
+    return;
+  }
+
+  // Attend le chargement asynchrone de count.js, avec un délai de sécurité.
+  let tries = 0;
+  const t = setInterval(() => {
+    tries++;
+    if (window.goatcounter && typeof window.goatcounter.count === "function") {
+      clearInterval(t);
+      send();
+    } else if (tries > 50) { // ~5 s
+      clearInterval(t);
+    }
+  }, 100);
+}
+
+/* Affiche le total des visites dans l'élément #homeCount.
+   Attend le chargement de count.js le temps nécessaire, avec un délai de
+   sécurité pour ne pas boucler indéfiniment. */
+function displayCounter() {
+  const el = document.getElementById("homeCount");
+  if (!el) return;
+
+  const render = () => {
+    window.goatcounter.visit_count({
+      append: "#homeCount",
+      path: "TOTAL",
+      no_branding: true
+    });
+  };
+
+  if (window.goatcounter && window.goatcounter.visit_count) {
+    render();
+    return;
+  }
+
+  let tries = 0;
+  const t = setInterval(() => {
+    tries++;
+    if (window.goatcounter && window.goatcounter.visit_count) {
+      clearInterval(t);
+      render();
+    } else if (tries > 50) { // ~5 s
+      clearInterval(t);
+    }
+  }, 100);
 }
 
 /* --------------------------------------------------------------------------

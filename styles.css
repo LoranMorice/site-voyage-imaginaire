@@ -440,6 +440,33 @@ kbd {
   text-shadow: 0 2px 10px rgba(0, 0, 0, 0.75);
 }
 
+/* Compteur de visites : rectangle discret placé sous l'astre, centré en
+   bas de la scène d'accueil (rempli par app.js via GoatCounter). */
+.home__count {
+  position: absolute;
+  left: 50%;
+  bottom: 7%;
+  transform: translateX(-50%);
+  z-index: 3;
+  padding: 0.5rem 1.1rem;
+  font-size: 0.72rem;
+  letter-spacing: 0.16em;
+  color: #e9e4d8;
+  background: rgba(8, 14, 30, 0.42);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 10px;
+  backdrop-filter: blur(6px);
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.6);
+}
+.home__count #gcvc-for,
+.home__count #gcvc-by {
+  display: none;
+}
+.home__count #gcvc-views {
+  font-weight: 600;
+  color: #ffe6ae;
+}
+
 /* ==========================================================================
    3 bis. ASTRE ANIMÉ (soleil le jour, lune la nuit)
    La trajectoire, la couleur et l'heure sont pilotées par app.js.

@@ -11,6 +11,12 @@
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚪</text></svg>" />
+
+  <!-- Compteur de visites GoatCounter : ne compte rien au chargement,
+       le comptage est déclenché manuellement dans app.js après le portail -->
+  <script data-goatcounter="https://loranjina.goatcounter.com/count"
+          data-goatcounter-settings='{"no_onload": true}'
+          async src="//gc.zgo.at/count.js"></script>
 </head>
 <body>
 
@@ -130,6 +136,9 @@
             Choisissez une porte dans la colonne de gauche.
           </p>
         </div>
+
+        <!-- Compteur de visites : rectangle placé sous l'astre. -->
+        <div class="home__count" id="homeCount" aria-live="polite">Visites&nbsp;:&nbsp;</div>
       </div>
     </section>
 
